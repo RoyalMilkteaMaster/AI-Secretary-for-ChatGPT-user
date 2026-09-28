@@ -1,0 +1,13 @@
+# This repository contains only shareable documentation and generic templates.
+.env
+.env.*
+!.env.example
+*credentials*
+*token*.json
+*.bundle
+*.zip
+*.pdf
+private/
+backups/
+node_modules/
+.DS_Store
