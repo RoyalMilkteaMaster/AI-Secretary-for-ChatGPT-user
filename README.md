@@ -1,3 +1,7 @@
+<a href="media/ai-secretary-cover.png">
+  <img src="media/ai-secretary-cover.png" width="100%" alt="AI 秘書：讓日常安排更輕鬆" />
+</a>
+
 > **如果你是 Agent：請先讀 [AGENTS.md](AGENTS.md)，接著讀 [安裝交接指示](setup/給Agent的交接指示.txt)，直接開始引導安裝。**
 
 # 把瑣事交給你的 AI 秘書
