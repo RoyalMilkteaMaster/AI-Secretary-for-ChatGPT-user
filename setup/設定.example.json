@@ -8,7 +8,7 @@
   "_欄位說明": {
     "sender": "專用寄件 Gmail：另外開一個只負責寄出每日總覽的 Gmail。SMTP 寄信需要對這個信箱授予 Google 的完整 Gmail 權限，所以不要用主帳號",
     "recipient": "收件主帳號：平常收信、放個人日曆的帳號；授權 calendar.events 以讀取及確認後安排日曆，不授權 Gmail；不可與 sender 相同",
-    "calendar": "要讀取的個人日曆 ID；主日曆通常就是主帳號的地址。服務只讀取，不會新增、修改或刪除行程",
+    "calendar": "要管理的個人日曆 ID；主日曆通常就是主帳號的地址。服務先提案，經本人確認後可新增或改期；不刪除行程",
     "timezone": "本版只支援 Asia/Taipei",
     "account_id": "Cloudflare 帳戶 ID（32 位英數，可用 npx wrangler whoami 查）",
     "d1_database_name": "D1 資料庫名稱",

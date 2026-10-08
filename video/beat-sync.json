@@ -1,0 +1,108 @@
+{
+  "bpm": 114.0,
+  "method": "percussive onset analysis, frame-quantized visual arrivals",
+  "arrivals": [
+    {
+      "scene": "ill-00",
+      "phase": 0,
+      "at": 0,
+      "nearest_detected_beat": 0.0413
+    },
+    {
+      "scene": "ill-00",
+      "phase": 1,
+      "at": 4.766666666666667,
+      "nearest_detected_beat": 4.7513
+    },
+    {
+      "scene": "ill-01",
+      "phase": 0,
+      "at": 10.533333333333333,
+      "nearest_detected_beat": 10.5313
+    },
+    {
+      "scene": "ill-01",
+      "phase": 1,
+      "at": 15.266666666666667,
+      "nearest_detected_beat": 15.2813
+    },
+    {
+      "scene": "ill-02",
+      "phase": 0,
+      "at": 20.0,
+      "nearest_detected_beat": 20.0113
+    },
+    {
+      "scene": "ill-02",
+      "phase": 1,
+      "at": 23.7,
+      "nearest_detected_beat": 23.7013
+    },
+    {
+      "scene": "ill-02",
+      "phase": 2,
+      "at": 26.333333333333332,
+      "nearest_detected_beat": 26.3313
+    },
+    {
+      "scene": "ill-03",
+      "phase": 0,
+      "at": 31.066666666666666,
+      "nearest_detected_beat": 31.0713
+    },
+    {
+      "scene": "ill-03",
+      "phase": 1,
+      "at": 41.06666666666667,
+      "nearest_detected_beat": 41.0613
+    },
+    {
+      "scene": "ill-03",
+      "phase": 2,
+      "at": 44.233333333333334,
+      "nearest_detected_beat": 44.2213
+    },
+    {
+      "scene": "ill-04",
+      "phase": 0,
+      "at": 46.86666666666667,
+      "nearest_detected_beat": 46.8613
+    },
+    {
+      "scene": "ill-04",
+      "phase": 1,
+      "at": 51.6,
+      "nearest_detected_beat": 51.5913
+    },
+    {
+      "scene": "ill-04",
+      "phase": 2,
+      "at": 54.766666666666666,
+      "nearest_detected_beat": 54.7513
+    },
+    {
+      "scene": "ill-05",
+      "phase": 0,
+      "at": 57.9,
+      "nearest_detected_beat": 57.9013
+    },
+    {
+      "scene": "ill-05",
+      "phase": 1,
+      "at": 63.166666666666664,
+      "nearest_detected_beat": 63.1713
+    },
+    {
+      "scene": "ill-06",
+      "phase": 0,
+      "at": 66.86666666666666,
+      "nearest_detected_beat": 66.8613
+    },
+    {
+      "scene": "ill-06",
+      "phase": 1,
+      "at": 69.46666666666667,
+      "nearest_detected_beat": 69.4813
+    }
+  ]
+}

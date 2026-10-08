@@ -1,5 +1,5 @@
 <a href="media/ai-secretary-cover.png">
-  <img src="media/ai-secretary-cover.png" width="100%" alt="AI 秘書：讓日常安排更輕鬆" />
+  <img src="media/ai-secretary-cover.webp" width="100%" alt="AI 秘書：讓日常安排更輕鬆" />
 </a>
 
 > **如果你是 Agent：請先讀 [AGENTS.md](AGENTS.md)，接著讀 [安裝交接指示](setup/給Agent的交接指示.txt)，直接開始引導安裝。**
@@ -27,9 +27,9 @@
 
 每天早上 9 點，它還會透過 Gmail 寄來一封提醒信，整理好當天的行程與待辦。事情做完後，你可以直接在信裡勾選完成，之後回到 ChatGPT，也能查到最新進度。
 
-**花一分半，看看設定和日常使用的樣子。**
+**看三個例子，了解秘書能怎麼幫你。**
 
-https://github.com/user-attachments/assets/dfac838d-9a81-435f-af00-5409ba4eb1fc
+https://github.com/user-attachments/assets/492ba458-77ef-4cdb-be9d-470e17686af0
 
 ## 怎麼開始？
 

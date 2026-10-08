@@ -10,9 +10,9 @@
 | `propose_calendar_change` | 提議新增或改期，讀取舊版本、檢查撞期，保存 15 分鐘有效的提案 | 否 |
 | `confirm_calendar_change` | 本人明確確認**這個提案**後，重新檢查、寫入、讀回 | 是 |
 
-先向本人展示標題、台北日期與起迄時間、修改前後、撞期結果。得到明確確認，才傳 `confirmed:true`。撞期時優先另找時間；只有本人明確接受已展示的撞期，才傳 `allow_conflict:true`。安裝同意不代表同意任何日曆安排。
+先向本人展示標題、台北日期與起迄時間、地點、修改前後、撞期結果。得到明確確認，才傳 `confirmed:true`。撞期時優先另找時間；只有本人明確接受已展示的撞期，才傳 `allow_conflict:true`。安裝同意不代表同意任何日曆安排。
 
-新增與改期都要有明確結束時間。全天用 `YYYY-MM-DD`，結束日不包含在內；其他用含時區的 ISO 時間。改期一定沿用原事件 ID。一般私人行程與某一次重複行程可修改；整組重複規則、邀請他人、受邀會議、特殊事件類型或刪除，帶本人在 Google Calendar 操作。
+新增與改期都要有明確結束時間。聚會只交代晚上 7 點時，詢問幾點結束，或明說建議時長再等本人確認。地點傳 `location`（最多 500 字），備註與活動 URL 傳 `description`（最多 4000 字）；省略時保留原欄位，明確要求清空才傳空字串。寫後讀回會核對這兩欄。全天用 `YYYY-MM-DD`，結束日不包含在內；其他用含時區的 ISO 時間。改期一定沿用原事件 ID。一般私人行程與某一次重複行程可修改；整組重複規則、邀請他人、受邀會議、特殊事件類型或刪除，帶本人在 Google Calendar 操作。
 
 ## 安裝與升級
 
@@ -39,6 +39,6 @@
 
 ## 驗證依據
 
-`tests/t10-calendar.mjs` 用虛構帳號、離線 HTTP 與 D1 驗證：確認前零寫入、撞期與邊界、分頁不完整拒絕、改期保留原 ID 與無關欄位、ETag 防覆寫、寫後讀回、遺失回覆不重寫、同時確認互斥、過期及舊只讀授權拒絕。這不代表已在任何使用者的正式帳號實測。
+`tests/t10-calendar.mjs` 用虛構帳號、離線 HTTP 與 D1 驗證：確認前零寫入、撞期與邊界、分頁不完整拒絕、改期保留原 ID 與無關欄位、ETag 防覆寫、地點與來源保存、改期保留／明確清空欄位、長度限制、地點讀回不符拒絕宣稱成功、寫後讀回、遺失回覆不重寫、同時確認互斥、過期及舊只讀授權拒絕。這不代表已在任何使用者的正式帳號實測。
 
 API 依據：[查詢](https://developers.google.com/workspace/calendar/api/v3/reference/events/list)、[新增](https://developers.google.com/workspace/calendar/api/v3/reference/events/insert)、[版本條件](https://developers.google.com/workspace/calendar/api/guides/version-resources)。

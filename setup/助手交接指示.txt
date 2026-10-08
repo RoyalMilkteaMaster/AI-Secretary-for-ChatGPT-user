@@ -9,7 +9,7 @@
 一、界線（每一條都必須遵守）
 ----------------------------
 1. 只在這個教材資料夾內工作。不安裝其他工具、不建立子代理或其他自動化。若缺少 Node.js，先說明需求，由本人從 nodejs.org 安裝相容的 LTS 版，或取得本人明確授權後協助安裝；裝好後以 node --version 核對。其他安裝僅限
-   在教材資料夾執行：npm install --no-audit --no-fund（版本已寫在 package.json）。
+   在教材資料夾執行：npm.cmd ci --no-audit --no-fund（完整版本已鎖在 package-lock.json）。
    Codex 或 Claude Code（可執行本機命令的版本）選一個即可；不要讓兩個助手同時操作同一個資料夾。
 2. 不讀取、不顯示、不複製任何秘密：.secrets\ 的內容、下載的 OAuth 用戶端 JSON 內容、
    Wrangler 登入憑證、refresh token、SIGNING_SECRET、一次性連結碼。不把它們貼進聊天、
@@ -26,7 +26,7 @@
    - 用 kind=test 做信件驗收：test 永遠不會進信，寄出會是空信。示範一律 kind=task。
    - 同一天重寄驗收信。驗收信每天只能一封（服務端以日期去重）；之後一律用 preview。
      結果顯示 uncertain_or_failed 時也不要重寄，先查收件匣、垃圾郵件與 status。
-   - 把 local-acceptance 或 npm test 的離線假收件說成 Gmail 驗收。實機驗收只看本人 Gmail 收到的信。
+   - 把 local-acceptance 或 npm.cmd test 的離線假收件說成 Gmail 驗收。實機驗收只看本人 Gmail 收到的信。
    - 未經 ready-check 與本人明確確認就開啟每日寄信，或把排程改成 0 1 * * * 以外的值。
    - 為了「修好問題」刪除、重建 D1，清空資料表，或換新 SIGNING_SECRET（--rotate 只在本人要求時）。
    - 把已完成（completed）的事項改回 pending 來重做示範。示範要重看就用 preview 或本機驗收。
@@ -64,19 +64,20 @@
 三、指令順序（對照操作手冊第 1～8 步）
 -------------------------------------
 第 1 步　設定包、桌面助手、兩個 Gmail
-  （本人把教材解壓到不會雲端同步的資料夾，例如 C:\AI秘書\，在這個資料夾開啟助手，貼上「開始這裡.txt」的起始文字）
+  （若只有 repo 網址，由你依根目錄 AGENTS.md 取得設定包，放到不會雲端同步的 Windows 資料夾；命令在 setup/ 執行。）
   node --version                         需要 v22.15 以上，建議 Node.js 24 LTS
-  powershell.exe -NoProfile -Command "$PSVersionTable.PSVersion"
-  npm install --no-audit --no-fund
-  npm test                               離線測試，不連網、不寄信
+  powershell.exe -NoProfile -Command '$PSVersionTable.PSVersion.ToString()'
+  npm.cmd ci --no-audit --no-fund
+  npm.cmd test                               離線測試，不連網、不寄信
   copy 設定.example.json 設定.json         詢問並核對本人資料後，由你填 sender（專用寄件 Gmail）、recipient（主帳號）、calendar
   node tools\prepare.mjs --instructions-only   產生 work\專案指示.已填.txt 給第 4 步使用
   上面「二、前置核對」
 
 第 2 步　Cloudflare 服務（依已確認的部署授權執行）
-  npx wrangler login                     本人在瀏覽器核對帳號後授權
-  npx wrangler whoami                    核對本人的 Account ID 後，由你填入 account_id
-  npx wrangler d1 create ai-secretary-progress    由你填入工具回傳的 d1_database_id
+  npx.cmd wrangler login                     本人在瀏覽器核對帳號後授權
+  npx.cmd wrangler whoami                    核對本人的 Account ID 後，由你填入 account_id
+  新 Cloudflare 帳號先確認信箱已驗證。到 Workers & Pages 查看 workers.dev 子網域；尚未建立時，帶本人選定可用名稱，已有的不要更改。不需購買網域。deploy 工具是非互動呼叫，不能假設會替你完成首次子網域設定。
+  npx.cmd wrangler d1 create ai-secretary-progress    由你填入工具回傳的 d1_database_id
   node tools\prepare.mjs                 第一次一定是 DAILY_ENABLED=false、crons=[]
   node tools\d1-init.mjs --check  →  node tools\d1-init.mjs     只建空白表格，沒有 seed
   node tools\deploy.mjs --check   →  node tools\deploy.mjs      首次部署，origin 可先空白
@@ -89,6 +90,7 @@
 第 3 步　Google 寄信與日曆事件授權（可協助一般導覽與非秘密表單；登入、選帳號、同意畫面與下載憑證由本人完成）
   具備已授權瀏覽器工具時協助建立 Google Cloud 專案、啟用 Gmail API 與 Google Calendar API、設定品牌與受眾；沒有工具則引導本人操作。服務條款、帳單與其他同意畫面由本人處理。接著
   建立「網頁應用程式」OAuth 用戶端（重新導向 http://localhost:8766/oauth/callback）
+  用戶端建立成功的當下，由本人下載 JSON；Google 只在建立時提供完整 secret。不要關掉視窗後才回頭找，也不要要求貼上 secret。若品牌網址被拒，先依實際錯誤核對官方要求；不填假網址或擅自購買網域。
   核對本人 Google 專案 ID，由你填入 google_project_id → node tools\prepare.mjs
   node tools\import-google-client.mjs "下載的 JSON 完整路徑"      不要打開或印出 JSON
   先說明下面「四、發布狀態與 7 天」，由本人決定要先用測試模式，還是授權前就轉正式。
@@ -102,13 +104,13 @@
 
 第 4 步　ChatGPT：新專案、自訂 MCP、工作模式、建立並改期同一筆
   示範待辦可以在完成第 5 步後再做，依「給Agent的交接指示.txt」第三階段驗收順序執行。
-  本人新增專案「AI 秘書」，記憶選「預設記憶」，把 work\專案指示.已填.txt 整份貼進指示。
-  本人：外掛程式 → 新增 → 建立自訂 MCP 伺服器
-        名稱：AI 秘書進度　伺服器 URL：服務網址/mcp　身分驗證：OAuth　→ 按「建立為外掛程式」
-  本人在打開的私人授權頁複製「請求識別」交給你（請求識別不是秘密）→
+  有已授權瀏覽器能力時，由你新建專案「AI 秘書」，選「預設記憶」，把 work\專案指示.已填.txt 整份填進指示。既有同名專案先辨識，不覆寫；沒有瀏覽器能力才引導本人。
+  由你協助：外掛程式 → 新增 → 建立自訂 MCP 伺服器
+        名稱：AI 秘書進度　伺服器 URL：服務網址/mcp　身分驗證：OAuth　→ 本人閱讀風險說明、同意後完成建立
+  你可從私人授權頁讀取「請求識別」（不是秘密），無瀏覽器能力時請本人複製給你 →
   node tools\admin.mjs approve <請求識別>     連結碼只放進本機剪貼簿，5 分鐘、一次、只限這次請求
   本人自己在「一次性連結碼」欄位貼上，按「授權這次連線」。連結碼不要經過聊天或錄影。
-  本人：工作模式 → 選擇專案「AI 秘書」→ 選「AI 秘書進度」外掛。
+  由你協助切換工作模式 → 選擇專案「AI 秘書」→ 選「AI 秘書進度」外掛。
   本人在這個專案的聊天依序要求（操作手冊有可直接複製的句子）：
     建立 DEMO_COURSE_APPLY_V5「【教材示範】寄出課程報名資料」，kind=task，截止 2026-10-16 18:00，讀回
     同一筆改為 2026-10-19 18:00，讀回；再用 list_steps 查回，確認只有一筆
@@ -139,12 +141,22 @@
   「【教材示範】」開頭，否則整批不變。
 
 第 8 步　每天台北 09:00（先完成第 6 步，再做第 7 步的示範清理，最後由本人明確說「通過，啟用」）
+  必須已完成本人日曆新增、改期與讀回驗收；若延期驗收，維持排程關閉，不能把人工項目標成通過。
   node tools\admin.mjs ready-check                       先看哪些項目未通過
   node tools\admin.mjs ready-check --human-checks-passed 只有本人親口確認人工項目後才加這個旗標
   node tools\prepare.mjs --enable-daily
   node tools\deploy.mjs --check  →  node tools\deploy.mjs
   請本人到 Cloudflare 觸發器確認只有 0 1 * * *；node tools\admin.mjs status 顯示 schedule_enabled=true
   下一個台灣 09:00 後：請本人看收件匣，再用 status 核對 daily:日期 的紀錄。在那之前只能說「已排程」。
+
+本機執行提醒
+------------
+- Windows PowerShell 使用 npm.cmd、npx.cmd，避免 npm.ps1 執行政策阻擋；不要因此變更整台電腦的執行政策。
+- 若 npm.cmd ci 提示 esbuild／workerd 的 allowScripts 尚未核准，先執行 npx.cmd --no-install wrangler --version，及 node_modules/.bin/ 下 esbuild.cmd、workerd.cmd 的 --version。三者正常就可繼續；若安裝腳本被阻擋且工具無法執行，依目前 npm 的提示，只核准設定包鎖定的 esbuild／workerd（支援此命令時用 npm.cmd approve-scripts esbuild workerd），再重跑 npm.cmd ci。不要核准所有套件或更改全機安全政策。這次乾淨安裝三者均正常回傳版本。
+- 匯入、authorize、install-secrets 全程使用同一位 Windows 使用者。DPAPI 解密失敗先核對執行身分，不要直接換憑證。
+- wrangler login 與 authorize 是等待本人操作的長程序：用可持續的命令工作階段啟動，工具回傳後立即引導本人開啟畫面，不要等程序結束才給網址。本人完成後再取結果。SMTP 和 Calendar 的 authorize 都用 8766 埠，一次只開一個。
+- Google 只在建立用戶端時提供完整秘密下載：https://support.google.com/cloud/answer/15549257?hl=en
+- workers.dev 設定依據：https://developers.cloudflare.com/workers/configuration/routing/workers-dev/
 
 四、Google 發布狀態與 7 天（第 3 步要先說明）
 --------------------------------------------

@@ -6,7 +6,7 @@ import {signClaims} from '../../app-template/secretary-sign.mjs';
 
 export const DEMO_PREFIX = 'DEMO_';
 export const DEMO_TITLE_PREFIX = '【教材示範】';
-// The two tutorial items shown in the video. cancel-demo touches only these by
+// The two fixed installation-acceptance demo items. cancel-demo touches only these by
 // default; other DEMO_ items need their IDs given explicitly.
 export const TUTORIAL_DEMOS = Object.freeze([
   Object.freeze({id: 'DEMO_COURSE_APPLY_V5', title: '【教材示範】寄出課程報名資料'}),

@@ -46,7 +46,8 @@ globalThis.fetch = offlineFetch({
       for (const key of Object.keys(value[field])) if (value[field][key] === null) delete value[field][key];
       assert.notEqual(!!value[field].date, !!value[field].dateTime, 'Google time has exactly one representation');
     }
-    if (mismatch) value.summary = 'Changed during readback';
+    if (mismatch === 'location') value.location = 'Unexpected location';
+    else if (mismatch) value.summary = 'Changed during readback';
     stored.set(value.id, value);
     if (loseReply) throw Error('NETWORK_REPLY_LOST');
     return Response.json(value);
@@ -197,5 +198,30 @@ reset(); p = await propose(env, input);
 sqlite.prepare("UPDATE calendar_proposals SET status='applying',updated_at=? WHERE id=?").run(Date.now() - 130000, p.proposal_id);
 await assert.rejects(() => confirm(env, {proposal_id: p.proposal_id, confirmed: true}), /RESULT_UNCERTAIN/);
 assert.equal(writes.length, 0);
+// Real-life examples: location/source notes survive creation and rescheduling.
+reset();
+const place = '小樹餐館', source = '活動來源：https://example.org/events/meetup';
+p = await propose(env, {...input, location: place, description: source});
+assert.equal(p.event.location, place);
+assert.equal(p.event.description, source);
+assert.equal(writes.length, 0);
+const located = await confirm(env, {proposal_id: p.proposal_id, confirmed: true});
+assert.equal(located.event.location, place);
+assert.equal(stored.get(located.event.id).description, source);
+stored.get(located.event.id).organizer = {self: true};
+p = await propose(env, {...input, operation: 'update', event_id: located.event.id, start: '2026-10-21T14:00:00+08:00', end: '2026-10-21T15:00:00+08:00'});
+assert.equal(p.event.location, place);
+await confirm(env, {proposal_id: p.proposal_id, confirmed: true});
+assert.equal(stored.get(located.event.id).location, place);
+assert.equal(stored.get(located.event.id).description, source);
+p = await propose(env, {...input, operation: 'update', event_id: located.event.id, location: '', description: ''});
+await confirm(env, {proposal_id: p.proposal_id, confirmed: true});
+assert.equal(stored.get(located.event.id).location, '');
+assert.equal(stored.get(located.event.id).description, '');
+for (const bad of [{location: null}, {location: 'x'.repeat(501)}, {description: 'x'.repeat(4001)}])
+  await assert.rejects(() => propose(env, {...input, ...bad}), /INVALID/);
+reset(); p = await propose(env, {...input, location: place}); mismatch = 'location';
+await assert.rejects(() => confirm(env, {proposal_id: p.proposal_id, confirmed: true}), /RESULT_UNCERTAIN/);
+assert.equal(writes.length, 1);
 sqlite.close();
 console.log('PASS t10: 指定日曆、提案不寫入、明確確認、全天/循環實例/透明/拒絕行程、撞期重查、版本保護、保留其他欄位、寫後讀回、遺失回覆不重寫、同時寫入隔離、過期與唯讀舊授權拒絕（全程離線）。');

@@ -98,9 +98,9 @@ footer{color:var(--muted);font-size:14px;text-align:center;padding:24px}
 <li><span class="tag t-you">本人操作：</span>在這個資料夾開啟你選的桌面助手，貼上「開始這裡.txt」的文字，讓 agent 自己讀取兩份交接指示。</li>
 <li><span class="tag t-ai">Agent 執行：</span>檢查環境並跑離線測試：
 <pre>node --version
-powershell.exe -NoProfile -Command "$PSVersionTable.PSVersion"
-npm install --no-audit --no-fund      <span class="c"># 安裝 package.json 鎖定的版本（會從 npm 下載）</span>
-npm test                              <span class="c"># 離線測試：不連到 Cloudflare/Google、不寄信</span></pre>
+powershell.exe -NoProfile -Command '$PSVersionTable.PSVersion.ToString()'
+npm.cmd ci --no-audit --no-fund      <span class="c"># 安裝 package-lock.json 鎖定的版本（會從 npm 下載）</span>
+npm.cmd test                              <span class="c"># 離線測試：不連到 Cloudflare/Google、不寄信</span></pre>
 出現錯誤先修好再往下。</li>
 </ol>
 <h3>填寫設定資料表</h3>
@@ -139,10 +139,11 @@ npm test                              <span class="c"># 離線測試：不連到
 <h2>第 2 步　建立自己的 Cloudflare 服務</h2>
 <h3>登入 Cloudflare</h3>
 <p><span class="tag t-you">本人操作：</span>先在瀏覽器登入自己的 Cloudflare。<span class="tag t-ai">Agent 執行：</span><span class="tag t-net">需同意：</span></p>
-<pre>npx wrangler login       <span class="c"># 瀏覽器出現確認頁：核對帳號與權限後，由你本人按允許</span>
-npx wrangler whoami      <span class="c"># 顯示 Account ID → 填入 設定.json 的 account_id</span></pre>
+<pre>npx.cmd wrangler login       <span class="c"># 瀏覽器出現確認頁：核對帳號與權限後，由你本人按允許</span>
+npx.cmd wrangler whoami      <span class="c"># 顯示 Account ID → 填入 設定.json 的 account_id</span></pre>
+<p>新帳號先完成信箱驗證，再到 Workers &amp; Pages 核對 workers.dev 子網域；若尚未建立，由 Agent 帶你選可用名稱。已有的不要改，不需買網域。部署工具為非互動程序，請在首次部署前完成這項準備。</p>
 <h3>建立空白 D1</h3>
-<pre>npx wrangler d1 create ai-secretary-progress
+<pre>npx.cmd wrangler d1 create ai-secretary-progress
 <span class="c"># 可選：加 --location apac。輸出的 database_id → 填入 設定.json 的 d1_database_id</span>
 node tools\prepare.mjs                <span class="c"># 產生工作副本；第一次一定是 DAILY_ENABLED=false、crons=[]</span>
 node tools\d1-init.mjs --check        <span class="c"># 只檢查：三份檔案只含 CREATE TABLE IF NOT EXISTS</span>
@@ -174,7 +175,7 @@ node tools\deploy.mjs</pre>
 <li><span class="tag t-ai">Agent 協助：</span>有授權瀏覽器工具時可協助，否則本人操作。目標對象（Audience，舊介面可能叫「受眾」）：使用者類型選「外部」。發布狀態是「測試中」時，把<b>寄件帳號與主帳號</b>都加入測試使用者。要不要轉正式版，先看下面「發布狀態與 7 天」。</li>
 <li><span class="tag t-you">本人操作：</span>用戶端 → 建立 OAuth 用戶端，類型選<b>網頁應用程式</b>，授權重新導向網址完整填入：
 <pre>http://localhost:8766/oauth/callback</pre>
-建立後下載 JSON，留在自己的電腦。</li>
+建立成功的當下就下載 JSON，留在自己的電腦；完整秘密只在建立時可下載，不要先關閉視窗。Agent 不讀取或顯示 JSON 內容。</li>
 </ol>
 <p><span class="tag t-ai">Agent 執行：</span></p>
 <pre>node tools\prepare.mjs
@@ -187,6 +188,7 @@ node tools\import-google-client.mjs "C:\Users\你的使用者名稱\Downloads\�
 <li><b>要長期使用</b>：目標對象 → 發布應用程式（Publish app），從「測試中」改為「正式版」（In production）。確定要長用的話，可以在下面授權<b>之前</b>就轉，省一次重新授權；若已在測試中授權，轉正式後照<a href="#oauth">附錄 B</a> 重新授權兩個帳號。</li>
 </ul>
 <p>詳細說明（未驗證警告、100 人以下的自用例外、權杖仍可能失效的情況）見<a href="#oauth">附錄 B</a>。</p>
+<p>Agent 用持續工作階段啟動 authorize，回傳後立即帶本人開啟授權頁，不等程序結束才給網址。匯入、授權與安裝秘密全程使用同一位 Windows 使用者；不要在 WSL 執行。</p>
 <h3>先授權專用寄件 Gmail</h3>
 <pre>node tools\authorize.mjs --smtp</pre>
 <p><span class="tag t-you">本人操作：</span>瀏覽器開啟 <code>http://localhost:8766/start</code>，<b>登入專用寄件 Gmail</b>。若出現「Google 尚未驗證這個應用程式」，先確認畫面上是你自己建立的應用程式名稱，才點「進階」繼續。成功頁出現後，助手會回報已加密保存。</p>
@@ -204,13 +206,14 @@ node tools\admin.mjs status           <span class="c"># 核對狀態（不含秘
 
 <section id="c04">
 <h2>第 4 步　ChatGPT：自訂 MCP、新專案、工作模式、建立並改期同一筆</h2>
+<p>有已授權的瀏覽器工具時，由 Codex 建立新專案、放入已填指示並填寫連線；本人處理登入、風險同意及一次性連結碼。沒有瀏覽器能力時，才按下面畫面逐步引導本人。</p>
 <h3>新建「AI 秘書」專案</h3>
 <ol>
-<li><span class="tag t-you">本人操作：</span>ChatGPT 側邊欄 → 新增專案，名稱「AI 秘書」，記憶選<b>預設記憶</b>（不要選「僅限專案記憶」，它無法做雲端工作）。<b>新建一個</b>，不要修改你原有的專案。</li>
-<li><span class="tag t-you">本人操作：</span>專案設定 → 把 <code>work\專案指示.已填.txt</code> 整份貼進指示欄位（由 agent 依自己的設定產生，不必自行修改範本）。</li>
+<li><span class="tag t-ai">Agent 可代做：</span>ChatGPT 側邊欄 → 新增專案，名稱「AI 秘書」，記憶選<b>預設記憶</b>（不要選「僅限專案記憶」，它無法做雲端工作）。<b>新建一個</b>，不要修改你原有的專案。</li>
+<li><span class="tag t-ai">Agent 可代做：</span>專案設定 → 把 <code>work\專案指示.已填.txt</code> 整份貼進指示欄位（由 agent 依自己的設定產生，不必自行修改範本）。</li>
 </ol>
 <h3>建立自訂 MCP 外掛</h3>
-<p><span class="tag t-you">本人操作：</span>外掛程式 → 新增 → 建立自訂 MCP 伺服器，填入：</p>
+<p><span class="tag t-ai">Agent 可代做：</span>外掛程式 → 新增 → 建立自訂 MCP 伺服器，填入：</p>
 <table>
 <tr><th>名稱</th><td>AI 秘書進度</td></tr>
 <tr><th>伺服器 URL</th><td>你的服務網址加上 <code>/mcp</code>；由 Agent 從部署結果填入，不照抄範例。</td></tr>
@@ -219,7 +222,7 @@ node tools\admin.mjs status           <span class="c"># 核對狀態（不含秘
 <p>閱讀風險說明後，由本人勾選「我已瞭解並希望繼續」。進階 OAuth 設定先保持預設，最後按「<b>建立為外掛程式</b>」。</p>
 <h3>私人授權頁與 5 分鐘連結碼</h3>
 <ol>
-<li><span class="tag t-you">本人操作：</span>接著會打開你自己服務的授權頁。把頁面上的「<b>請求識別</b>」（43 個字元）整串複製給助手。這串不是秘密。</li>
+<li><span class="tag t-you">本人操作：</span>接著會打開你自己服務的授權頁。Agent 可直接讀取頁面上的「<b>請求識別</b>」（43 個字元）；無瀏覽器能力時再由本人整串複製給助手。這串不是秘密。</li>
 <li><span class="tag t-ai">Agent 執行：</span>
 <pre>node tools\admin.mjs approve 貼上請求識別</pre>
 一次性連結碼只會放進你電腦的剪貼簿，不會顯示在聊天裡。</li>
@@ -227,7 +230,7 @@ node tools\admin.mjs status           <span class="c"># 核對狀態（不含秘
 </ol>
 <div class="warn">連結碼不要貼進任何聊天，也不要拍進錄影：正在錄影的話，貼上前先暫停或遮住畫面（欄位本身會以圓點遮蔽）。碼 5 分鐘內有效、只能用一次、只對這次請求有效；過期就重新開始連線、取得新的請求識別。剪貼簿不能用時可改 <code>approve 請求識別 --file</code>，碼會寫在 <code>work\private\</code>，用完刪除。</div>
 <h3>用工作模式選專案與外掛</h3>
-<p><span class="tag t-you">本人操作：</span>切換到<b>工作模式</b> → 選擇專案「AI 秘書」→ 選「AI 秘書進度」外掛。聊天拿不到工具時，先確認這三項，再重開聊天。</p>
+<p><span class="tag t-ai">Agent 可代做：</span>切換到<b>工作模式</b> → 選擇專案「AI 秘書」→ 選「AI 秘書進度」外掛。聊天拿不到工具時，先確認這三項，再重開聊天。</p>
 <h3>建立一筆，再改期同一筆</h3>
 <p>在這個聊天直接貼：</p>
 <pre>教材示範：用「AI 秘書進度」新增一筆待辦。
@@ -388,7 +391,7 @@ node tools\admin.mjs status</pre></li>
 <tr><td><code>tools\admin.mjs</code></td><td>approve、status、preview、send-validation、ready-check、cancel-demo，以及備用的 create-demo</td></tr>
 <tr><td><code>tools\local-acceptance.mjs</code></td><td>本機專用驗收（離線）</td></tr>
 <tr><td><code>tools\scan-kit.mjs</code></td><td>教材敏感資料掃描與 SHA-256 清單</td></tr>
-<tr><td><code>tests\</code></td><td>離線測試（<code>npm test</code>）</td></tr>
+<tr><td><code>tests\</code></td><td>離線測試（<code>npm.cmd test</code>）</td></tr>
 <tr><td><code>reports\</code></td><td>離線驗證報告、完整性與秘鑰掃描報告、與原程式差異</td></tr>
 </table>
 <p>執行後才會出現、<b>不要分享</b>的資料夾：<code>設定.json</code>、<code>work\</code>（產生的副本與 <code>work\private\</code> 預覽、驗收紀錄）、<code>.secrets\</code>（Windows 加密憑證）、<code>node_modules\</code>。</p>
@@ -398,7 +401,7 @@ node tools\admin.mjs status</pre></li>
 <h2>附錄 E　指令總表</h2>
 <table>
 <tr><th>指令</th><th>做什麼</th><th>對外？</th></tr>
-<tr><td><code>npm test</code></td><td>離線測試</td><td>否</td></tr>
+<tr><td><code>npm.cmd test</code></td><td>離線測試</td><td>否</td></tr>
 <tr><td><code>node tools\prepare.mjs [--instructions-only | --enable-daily | --disable-daily]</code></td><td>產生工作副本／專案指示；切換每日寄信開關（需另外 deploy）</td><td>否</td></tr>
 <tr><td><code>node tools\deploy.mjs [--check]</code></td><td>部署</td><td>是</td></tr>
 <tr><td><code>node tools\d1-init.mjs [--check]</code></td><td>建立空白表格</td><td>是</td></tr>
@@ -423,7 +426,7 @@ node tools\admin.mjs status</pre></li>
 <pre>node tools\prepare.mjs
 node tools\local-acceptance.mjs</pre>
 <div class="warn">本機驗收是離線假收件，不是 Gmail 實際收信，也不能拿來通過 ready-check。第 6 步仍要在自己的帳號完成實際收信與勾選。</div>
-<p><b>離線測試</b>（<code>npm test</code>）在 <code>tests\.tmp</code> 建立拋棄式副本，用虛構值檢查：設定驗證與未填不可部署、錯誤帳號拒絕、無秘密洩漏、prepare 重跑不覆蓋授權、驗收守門、cancel-demo 只處理指定示範，以及與原程式的回歸測試；在 Windows 上另外檢查 DPAPI 加密儲存。</p>
+<p><b>離線測試</b>（<code>npm.cmd test</code>）在 <code>tests\.tmp</code> 建立拋棄式副本，用虛構值檢查：設定驗證與未填不可部署、錯誤帳號拒絕、無秘密洩漏、prepare 重跑不覆蓋授權、驗收守門、cancel-demo 只處理指定示範，以及與原程式的回歸測試；在 Windows 上另外檢查 DPAPI 加密儲存。</p>
 </section>
 
 <section id="security">

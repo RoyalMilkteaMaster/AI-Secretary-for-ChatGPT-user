@@ -25,7 +25,7 @@ const googleTime = (value, zone = ZONE, patch = false) => value.length === 10
   ? {date: value, ...(patch ? {dateTime: null, timeZone: null} : {})}
   : {dateTime: value, timeZone: zone, ...(patch ? {date: null} : {})};
 function summary(e) {
-  return {id: e.id, title: e.summary || '未命名行程', start: e.start?.dateTime || e.start?.date,
+  return {id: e.id, title: e.summary || '未命名行程', location: e.location || '', start: e.start?.dateTime || e.start?.date,
     end: e.end?.dateTime || e.end?.date, all_day: !!e.start?.date,
     busy: e.transparency !== 'transparent' && !e.attendees?.some(a => a.self && a.responseStatus === 'declined')};
 }
@@ -57,7 +57,7 @@ async function events(token, start, end) {
   for (let page = 0; page < 10; page++) {
     const params = new URLSearchParams({timeMin: start.length === 10 ? start + 'T00:00:00+08:00' : start,
       timeMax: new Date(hi).toISOString(), timeZone: ZONE, singleEvents: 'true', orderBy: 'startTime', maxResults: '250',
-      fields: 'items(id,summary,start,end,status,transparency,attendees(self,responseStatus)),nextPageToken', ...(pageToken ? {pageToken} : {})});
+      fields: 'items(id,summary,location,start,end,status,transparency,attendees(self,responseStatus)),nextPageToken', ...(pageToken ? {pageToken} : {})});
     const r = await request(token, '?' + params);
     if (!r.ok) fail('CALENDAR_READ_FAILED');
     const data = await r.json();
@@ -92,8 +92,14 @@ function editable(e) {
   if (e.recurrence || e.organizer?.self !== true || e.attendees?.some(a => !a.self) || (e.eventType && e.eventType !== 'default')) fail('CALENDAR_USE_GOOGLE_FOR_THIS_EVENT');
 }
 export async function proposeCalendarChange(env, args) {
-  fields(args, ['operation', 'event_id', 'title', 'start', 'end']);
+  fields(args, ['operation', 'event_id', 'title', 'start', 'end', 'location', 'description']);
   if (!['create', 'update'].includes(args.operation) || typeof args.title !== 'string' || !args.title.trim() || args.title.length > 300) fail('INVALID_ARGUMENTS');
+  const details = {};
+  for (const [key, limit] of [['location', 500], ['description', 4000]]) {
+    if (args[key] === undefined) continue;
+    if (typeof args[key] !== 'string' || args[key].length > limit) fail('INVALID_ARGUMENTS');
+    details[key] = args[key].trim();
+  }
   interval(args.start, args.end);
   if (args.operation === 'create' && args.event_id !== undefined) fail('INVALID_ARGUMENTS');
   if (args.operation === 'update') eventId(args.event_id);
@@ -103,19 +109,21 @@ export async function proposeCalendarChange(env, args) {
   const proposal_id = 's' + crypto.randomUUID().replaceAll('-', '');
   const event_id = old?.id || proposal_id;
   const clashes = conflicts(await events(token, args.start, args.end), event_id);
-  const payload = {operation: args.operation, event_id, title: args.title.trim(), start: args.start, end: args.end,
+  const payload = {operation: args.operation, event_id, title: args.title.trim(), start: args.start, end: args.end, details,
     etag: old?.etag || null, before: old ? summary(old) : null, conflicts: clashes,
     private_properties: old?.extendedProperties?.private || {}, start_zone: old?.start?.timeZone || ZONE, end_zone: old?.end?.timeZone || ZONE};
   const expires_at = Date.now() + TTL;
   await env.DB.prepare("INSERT INTO calendar_proposals(id,payload,status,expires,updated_at) VALUES (?,?,'pending',?,?)")
     .bind(proposal_id, JSON.stringify(payload), expires_at, Date.now()).run();
-  return {proposal_id, operation: payload.operation, calendar: OWNER.calendar, event: {id: event_id, title: payload.title, start: args.start, end: args.end},
+  return {proposal_id, operation: payload.operation, calendar: OWNER.calendar, event: {id: event_id, title: payload.title, start: args.start, end: args.end,
+    location: details.location ?? old?.location ?? '', description: details.description ?? old?.description ?? ''},
     before: payload.before, conflicts: clashes, expires_at: new Date(expires_at).toISOString(), written: false,
     next: '請向本人展示這個日期、時間、標題與撞期結果，取得明確確認後才呼叫 confirm_calendar_change；撞期時先建議其他時間。'};
 }
 function matches(e, p, id) {
   return !!e && e.id === p.event_id && e.summary === p.title && e.extendedProperties?.private?.secretary_proposal === id &&
-    instant(e.start?.dateTime || e.start?.date) === instant(p.start) && instant(e.end?.dateTime || e.end?.date) === instant(p.end);
+    instant(e.start?.dateTime || e.start?.date) === instant(p.start) && instant(e.end?.dateTime || e.end?.date) === instant(p.end) &&
+    Object.entries(p.details || {}).every(([key, value]) => (e[key] || '') === value);
 }
 async function recordSuccess(env, id, e) {
   const result = {written: true, verified: true, event: summary(e), calendar: OWNER.calendar, verified_at: new Date().toISOString()};
@@ -160,7 +168,7 @@ export async function confirmCalendarChange(env, args) {
     const clashes = conflicts(await events(token, p.start, p.end), p.event_id);
     if (fingerprint(clashes) !== fingerprint(p.conflicts)) fail('CALENDAR_CONFLICTS_CHANGED');
     const patch = p.operation === 'update';
-    const body = {summary: p.title, start: googleTime(p.start, p.start_zone, patch), end: googleTime(p.end, p.end_zone, patch),
+    const body = {summary: p.title, ...p.details, start: googleTime(p.start, p.start_zone, patch), end: googleTime(p.end, p.end_zone, patch),
       extendedProperties: {private: {...p.private_properties, secretary_proposal: row.id}}, ...(p.operation === 'create' ? {id: p.event_id} : {})};
     if (Date.now() >= token.deadline) fail('CALENDAR_CHECK_TIMEOUT');
     const held = await env.DB.prepare("UPDATE calendar_proposals SET updated_at=? WHERE id=? AND status='applying' RETURNING id").bind(Date.now(), row.id).first();
