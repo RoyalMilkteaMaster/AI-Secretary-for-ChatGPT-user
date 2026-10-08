@@ -33,6 +33,8 @@ Word 匯出 PDF，共 12 頁，每頁一個步驟；逐頁轉圖並由 Codex 檢
 - 成片 -15.6 LUFS，True Peak -1.3 dBFS。最終影片抽出的聲音與已審查音檔 SHA-256 相同。
 - README 改用 GitHub 附件播放器，另保留 MP4 與字幕下載。GitHub 的影片附件格式與大小規則見 [官方說明](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files)。
 
+2026-10-09 已從 GitHub 正式首頁實際點擊播放：94.5 秒影片成功載入，播放進度由 26.02 秒前進到 48.42 秒，readyState=4，沒有媒體錯誤。另核對 GitHub 上的新版 PDF 檔案大小與提交版本一致。
+
 ## 實際安裝仍要驗收
 
 收件匣送達、Gmail 手機互動、本人 ChatGPT 的連接功能、Google 日曆真實讀寫、首次台北 09:00 收件及各平台當時的授權要求，須由每位使用者在自己的帳號驗收。倉庫仍為私人；這次更新沒有變更可見性。
