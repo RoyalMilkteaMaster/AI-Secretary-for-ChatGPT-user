@@ -1,0 +1,197 @@
+助手交接指示（由 agent 讀取；使用者入口為「開始這裡.txt」）
+================================================================
+
+你要協助「本人」在本人自己的 Windows 電腦上，用這個教材資料夾設定本人自己的 AI 秘書：
+自己的 Cloudflare Worker＋D1、自己的 Google OAuth（專用寄件 Gmail 寄信＋主帳號日曆唯讀）、
+自己的 ChatGPT 私人外掛。完整技術步驟在「操作手冊.html」。請先讀「給Agent的交接指示.txt」；本版影片只介紹交給 agent 的方式，不逐一教後台設定。
+本人可能完全沒有寫程式經驗。可由你完成的設定、資料填寫與核對直接處理；需要本人接手時，每次只給一個動作。本人登入、帳號選擇與授權仍由本人完成。
+
+一、界線（每一條都必須遵守）
+----------------------------
+1. 只在這個教材資料夾內工作。不安裝其他工具、不建立子代理或其他自動化。若缺少 Node.js，先說明需求，由本人從 nodejs.org 安裝相容的 LTS 版，或取得本人明確授權後協助安裝；裝好後以 node --version 核對。其他安裝僅限
+   在教材資料夾執行：npm install --no-audit --no-fund（版本已寫在 package.json）。
+   Codex 或 Claude Code（可執行本機命令的版本）選一個即可；不要讓兩個助手同時操作同一個資料夾。
+2. 不讀取、不顯示、不複製任何秘密：.secrets\ 的內容、下載的 OAuth 用戶端 JSON 內容、
+   Wrangler 登入憑證、refresh token、SIGNING_SECRET、一次性連結碼。不把它們貼進聊天、
+   記錄、截圖說明或其他檔案。需要它們的工具會自己透過 Windows 加密儲存與 stdin 管道處理。
+3. 不手動修改 work\app\ 的任何檔案。要改設定就改「設定.json」，再執行 node tools\prepare.mjs。
+   deploy 會拒絕被手動改過的工作副本，這是刻意的。
+4. 開始前先確認本人已同意在本人自己的帳戶部署此服務、寄出一封驗收信，以及驗收後啟用每日寄信。
+   授權可以一次涵蓋這些明確步驟；已有授權的必要操作不逐步重問。每日提醒仍須在最終驗收後由本人當下確認啟用。本人仍須親自登入、核對帳號並
+   完成 OAuth 授權。若遇到未涵蓋的費用、不同帳戶、刪除資料或改變排程範圍，先說明再確認。
+   所有指令的確認旗標都必須反映實際授權，不能把未驗收說成通過。
+5. 嚴禁：
+   - 用 wrangler secret put 名稱 值，或任何把秘密放在命令參數裡的寫法。
+   - 自行組合請求呼叫管理端的 send_daily（每日信只由排程寄）。
+   - 用 kind=test 做信件驗收：test 永遠不會進信，寄出會是空信。示範一律 kind=task。
+   - 同一天重寄驗收信。驗收信每天只能一封（服務端以日期去重）；之後一律用 preview。
+     結果顯示 uncertain_or_failed 時也不要重寄，先查收件匣、垃圾郵件與 status。
+   - 把 local-acceptance 或 npm test 的離線假收件說成 Gmail 驗收。實機驗收只看本人 Gmail 收到的信。
+   - 未經 ready-check 與本人明確確認就開啟每日寄信，或把排程改成 0 1 * * * 以外的值。
+   - 為了「修好問題」刪除、重建 D1，清空資料表，或換新 SIGNING_SECRET（--rotate 只在本人要求時）。
+   - 把已完成（completed）的事項改回 pending 來重做示範。示範要重看就用 preview 或本機驗收。
+   - 修改本人在 ChatGPT 既有的專案。本教材只新建「AI 秘書」專案。
+   - 對原作者或任何第三方的帳戶、網址、資料做任何操作。設定值只能是本人的。
+6. 誠實回報，以指令輸出為準：
+   - 「Gmail SMTP 已接受」不等於已送達收件匣，更不等於本人已讀。
+   - preview 只是預覽，沒有寄信；本機驗收（local-acceptance）是離線模擬，不是實機。
+   - deploy 只有在 Wrangler 回報成功時才說「已部署」；沒有執行的步驟要說「未執行」。
+   - 每日 09:00 有沒有成功，只能在那個時間過後由本人看收件匣、再用 status 核對；之前不能說已成功。
+   - Google OAuth 政策（測試／正式、權杖期限、未驗證警告）、ChatGPT 外掛與工作模式是否可用、
+     公司或學校帳戶的管理限制，這些你無法替本人驗證，要請本人在自己的畫面確認。
+   - 不要宣稱任何 ChatGPT 方案（包括最便宜的訂閱）一定支援這些功能；以本人畫面為準。
+7. 日曆是唯讀：雲端服務只讀設定中的一本日曆，「AI 秘書進度」外掛不會新增、修改或刪除
+   Google 日曆。不要對本人承諾聊天能幫他改行程。
+8. 一次性連結碼：admin.mjs approve 只把碼放進本機剪貼簿，由本人自己貼到授權頁。不要把碼印出、
+   貼回聊天或讓它出現在錄影畫面；若本人正在錄影，提醒他貼上前先暫停錄影或遮住畫面。
+
+二、第 1 步的前置核對：ChatGPT 帳號功能（在動 Cloudflare 與 Google 之前做）
+------------------------------------------------------------------------
+請本人用電腦瀏覽器登入 ChatGPT，確認左下角是要使用的「個人帳號」，然後逐項回報看得到或看不到：
+  a. 外掛程式 → 新增 → 建立自訂 MCP 伺服器（只看入口，先不要建立）
+  b. 新增專案時，記憶可以選「預設記憶」（本教材不用「僅限專案記憶」：它無法做雲端工作）
+  c. 輸入框可以切換「工作模式」，並在其中選擇專案
+三項都看得到才往下。任何一項看不到，就停在這一步，不要繞過、不要改用僅限專案記憶、不要
+修改既有專案，依序請本人排查：
+  1) 確認登入的是個人帳號；若在公司、學校或團隊工作區，管理員可能關閉了自訂外掛、記憶或工作模式，
+     請切回個人帳號或詢問管理員。
+  2) 改用電腦版瀏覽器開 ChatGPT 網頁並重新整理；必要時登出再登入。
+  3) 設定 → 個人化 → 記憶：確認個人記憶沒有被關閉（影響 b）。
+  4) 依目前官方說明及本人實際畫面核對必要設定，不猜測入口或開關。
+  5) 到設定 → 帳戶查看自己的方案。不同方案與地區提供的功能可能不同；不要假設任何方案一定支援。
+  6) 以上都確認後仍沒有，請本人到 OpenAI 說明中心查詢或聯絡支援；在功能出現之前，這套教材無法完成第 4 步。
+回報本人看到的實際畫面文字，不要猜。
+
+三、指令順序（對照操作手冊第 1～8 步）
+-------------------------------------
+第 1 步　設定包、桌面助手、兩個 Gmail
+  （本人把教材解壓到不會雲端同步的資料夾，例如 C:\AI秘書\，在這個資料夾開啟助手，貼上「開始這裡.txt」的起始文字）
+  node --version                         需要 v22.15 以上，建議 Node.js 24 LTS
+  powershell.exe -NoProfile -Command "$PSVersionTable.PSVersion"
+  npm install --no-audit --no-fund
+  npm test                               離線測試，不連網、不寄信
+  copy 設定.example.json 設定.json         詢問並核對本人資料後，由你填 sender（專用寄件 Gmail）、recipient（主帳號）、calendar
+  node tools\prepare.mjs --instructions-only   產生 work\專案指示.已填.txt 給第 4 步使用
+  上面「二、前置核對」
+
+第 2 步　Cloudflare 服務（依已確認的部署授權執行）
+  npx wrangler login                     本人在瀏覽器核對帳號後授權
+  npx wrangler whoami                    核對本人的 Account ID 後，由你填入 account_id
+  npx wrangler d1 create ai-secretary-progress    由你填入工具回傳的 d1_database_id
+  node tools\prepare.mjs                 第一次一定是 DAILY_ENABLED=false、crons=[]
+  node tools\d1-init.mjs --check  →  node tools\d1-init.mjs     只建空白表格，沒有 seed
+  node tools\deploy.mjs --check   →  node tools\deploy.mjs      首次部署，origin 可先空白
+  （由你把 Wrangler 顯示的本人服務網址填入 origin）
+  node tools\prepare.mjs  →  node tools\deploy.mjs              第二次部署，啟用私人路由
+  請本人開啟 服務網址 與 服務網址/privacy 確認
+  node tools\signing-secret.mjs          本機產生並經 stdin 安裝 SIGNING_SECRET
+  （可選）node tools\local-acceptance.mjs   離線演練，不寄信；不能當成 Gmail 驗收
+
+第 3 步　Google 寄信與唯讀日曆授權（可協助一般導覽與非秘密表單；登入、選帳號、同意畫面與下載憑證由本人完成）
+  具備已授權瀏覽器工具時協助建立 Google Cloud 專案、啟用 Gmail API 與 Google Calendar API、設定品牌與受眾；沒有工具則引導本人操作。服務條款、帳單與其他同意畫面由本人處理。接著
+  建立「網頁應用程式」OAuth 用戶端（重新導向 http://localhost:8766/oauth/callback）
+  核對本人 Google 專案 ID，由你填入 google_project_id → node tools\prepare.mjs
+  node tools\import-google-client.mjs "下載的 JSON 完整路徑"      不要打開或印出 JSON
+  先說明下面「四、發布狀態與 7 天」，由本人決定要先用測試模式，還是授權前就轉正式。
+  授權一次一個，不要同時執行兩個：
+  node tools\authorize.mjs --smtp        本人開 http://localhost:8766/start，登入「專用寄件 Gmail」
+                                         （Google 要求完整 Gmail 權限，所以只用專用寄件信箱）
+  node tools\authorize.mjs --calendar    本人開同一網址，改登入「主帳號」（只有日曆事件唯讀）
+  node tools\install-secrets.mjs         只顯示名稱；核對帳號、範圍、用戶端與專案
+  node tools\admin.mjs status            確認 mail_credentials_installed、mail_accounts_match_settings、
+                                         calendar_connected 都是 true，schedule_enabled 是 false
+
+第 4 步　ChatGPT：新專案、自訂 MCP、工作模式、建立並改期同一筆
+  示範待辦可以在完成第 5 步後再做，依「給Agent的交接指示.txt」第三階段驗收順序執行。
+  本人新增專案「AI 秘書」，記憶選「預設記憶」，把 work\專案指示.已填.txt 整份貼進指示。
+  本人：外掛程式 → 新增 → 建立自訂 MCP 伺服器
+        名稱：AI 秘書進度　伺服器 URL：服務網址/mcp　身分驗證：OAuth　→ 按「建立為外掛程式」
+  本人在打開的私人授權頁複製「請求識別」交給你（請求識別不是秘密）→
+  node tools\admin.mjs approve <請求識別>     連結碼只放進本機剪貼簿，5 分鐘、一次、只限這次請求
+  本人自己在「一次性連結碼」欄位貼上，按「授權這次連線」。連結碼不要經過聊天或錄影。
+  本人：工作模式 → 選擇專案「AI 秘書」→ 選「AI 秘書進度」外掛。
+  本人在這個專案的聊天依序要求（操作手冊有可直接複製的句子）：
+    建立 DEMO_COURSE_APPLY_V5「【教材示範】寄出課程報名資料」，kind=task，截止 2026-10-16 18:00，讀回
+    同一筆改為 2026-10-19 18:00，讀回；再用 list_steps 查回，確認只有一筆
+  （可選）node tools\admin.mjs preview     只讀，確認服務端看到同一筆與新日期
+  若本人操作時這些日期已經過去，可改用未來日期；ID 與標題不變。
+
+第 5 步　Gmail 動態郵件
+  本人在主帳號 Gmail 開啟動態郵件，在開發人員設定加入專用寄件地址。這一步不寄信。
+
+第 6 步　一封驗收信及讀回
+  node tools\admin.mjs preview                          先核對事項與日期（不寄信）
+  node tools\admin.mjs send-validation                  只顯示寄件、收件、事項與行程數，不寄信
+  請本人逐行確認收件者是自己的主帳號、內容正確，明確同意後才：
+  node tools\admin.mjs send-validation --confirm-one-email  寄出今天唯一一封驗收信
+  本人在 Gmail 打開這封信，勾選 DEMO_COURSE_APPLY_V5，等畫面顯示已保存（字樣可能是「已保存」或「完成已保存」），關閉重開仍在。
+  本人在原聊天讀回同一筆＝completed；node tools\admin.mjs preview 確認已排除。
+  寄信到勾選之間不要修改這筆事項（舊信綁定當時的版本）。
+
+第 7 步　日常使用與示範清理（清理完成後才執行第 8 步）
+  本人在同一個聊天交辦下一步：
+    新增 DEMO_COURSE_RECEIPT_V5「【教材示範】確認主辦單位收到資料」，kind=task，截止 2026-10-20 18:00，讀回
+  node tools\admin.mjs preview        核對下一步，只預覽不寄信
+  DEMO_COURSE_APPLY_V5 保持 completed，不要改回 pending。
+  整段示範完成後、啟用每日排程之前：
+  node tools\admin.mjs cancel-demo        預設只取消 DEMO_COURSE_APPLY_V5 與 DEMO_COURSE_RECEIPT_V5，並逐筆讀回
+  再請本人在聊天讀回兩筆都是 cancelled。取消不是刪除，紀錄會保留但不再進信。
+  cancel-demo 不會碰其他事項；要取消別的示範必須明確寫 --ids DEMO_A,DEMO_B，而且標題要以
+  「【教材示範】」開頭，否則整批不變。
+
+第 8 步　每天台北 09:00（先完成第 6 步，再做第 7 步的示範清理，最後由本人明確說「通過，啟用」）
+  node tools\admin.mjs ready-check                       先看哪些項目未通過
+  node tools\admin.mjs ready-check --human-checks-passed 只有本人親口確認人工項目後才加這個旗標
+  node tools\prepare.mjs --enable-daily
+  node tools\deploy.mjs --check  →  node tools\deploy.mjs
+  請本人到 Cloudflare 觸發器確認只有 0 1 * * *；node tools\admin.mjs status 顯示 schedule_enabled=true
+  下一個台灣 09:00 後：請本人看收件匣，再用 status 核對 daily:日期 的紀錄。在那之前只能說「已排程」。
+
+四、Google 發布狀態與 7 天（第 3 步要先說明）
+--------------------------------------------
+- Google 官方說明：使用者類型為「外部」、發布狀態為「測試中」的專案，取得的 refresh token
+  會在 7 天後失效（只要求姓名、電子郵件、基本資料的例外，本教材的 Gmail 與 Calendar 不在例外內）。
+  https://developers.google.com/identity/protocols/oauth2
+- 只想先試用：測試模式即可，但 7 天後寄信與日曆會失效（status 會出現 uncertain_or_failed 或日曆警告）。
+- 要長期使用：在 Google Auth Platform → 目標對象（Audience，舊介面可能叫「受眾」）按「發布應用程式」
+  （Publish app），把發布狀態從「測試中」改為「正式版」（In production）。若在測試模式時已授權，
+  改完後要重新授權兩個帳號並重裝：
+    node tools\authorize.mjs --smtp --replace
+    node tools\authorize.mjs --calendar --replace
+    node tools\install-secrets.mjs --only smtp,calendar
+  若本人確定要長期使用，也可以在第 3 步授權之前就先轉正式，省下一次重新授權。
+- 轉正式後授權時，可能看到「Google 尚未驗證這個應用程式」。自用且使用者少於 100 人的情況，
+  Google 列有驗證例外，不代表每個人都必須做昂貴的安全評估：
+  https://support.google.com/cloud/answer/13464323?hl=en
+  但例外不代表測試模式的權杖會變成永久，也不保證畫面不出現其他要求；以本人看到的 Google 實際提示為準。
+- 即使是正式版，refresh token 也不保證永不失效。Google 文件列出的情況包括：本人撤銷授權、
+  長時間未使用、含 Gmail 範圍的帳號變更密碼、管理員限制等。失效時照「五、出問題時」重新授權。
+
+五、出問題時
+------------
+- 沒收到信：先請本人看垃圾郵件 → node tools\admin.mjs status 看當天紀錄 → 沒有紀錄就查
+  schedule_enabled 與 Cloudflare 觸發器 → 有 uncertain_or_failed 再查授權。不要連續重寄。
+- 約 7 天後突然寄不出或日曆讀不到：多半是測試模式權杖到期，照「四」轉正式並重新授權。
+- 信裡沒有勾選格：請本人確認用 Gmail 網頁或 Gmail App 開信、主帳號已開動態郵件、允許的寄件地址
+  與 sender 完全一致。Apple Mail 等其他郵件 App 只會顯示一般版本。
+- 勾了沒保存：請本人在聊天讀回同一筆；仍未完成再查 status 與網路。外觀打勾不等於已保存。
+- 寄信授權過期：node tools\authorize.mjs --smtp --replace → node tools\install-secrets.mjs --only smtp
+- 日曆授權過期：node tools\authorize.mjs --calendar --replace → node tools\install-secrets.mjs --only calendar
+- 換了 OAuth 用戶端：import-google-client.mjs --replace，兩種授權都加 --replace 重做，
+  再 install-secrets.mjs --only client,smtp,calendar
+- 聊天拿不到外掛工具：確認是用工作模式、選了「AI 秘書」專案並選了「AI 秘書進度」外掛；重開聊天再試。
+- 想暫停每日信：node tools\prepare.mjs --disable-daily → node tools\deploy.mjs
+- 任何工具說「設定.json 尚未完成」或「請重新執行 prepare」：照訊息修正設定或重跑 prepare，不要繞過。
+
+六、舊使用者附錄（第一次安裝的人跳過）
+------------------------------------
+- 以前在 ChatGPT 設過同用途的「每天九點巡查」等排程：等第 8 步確認新流程排程後，再請本人自己
+  停用那個舊排程，避免一天收到兩封。其他不相關的排程不要動。
+- 舊版教材留下的示範事項（例如 DEMO_TUTORIAL_CHAT、DEMO_TUTORIAL_EMAIL）不會被預設的 cancel-demo
+  處理；本人確認後才明確指定：
+    node tools\admin.mjs cancel-demo --ids DEMO_TUTORIAL_CHAT,DEMO_TUTORIAL_EMAIL
+
+七、回報格式
+------------
+每一步回報：做了什麼指令 → 工具輸出的結論（成功／失敗／未執行）→ 本人下一步要在畫面上做什麼。
+不要附上任何秘密值；設定值（帳號地址、ID）可以列出供本人核對。

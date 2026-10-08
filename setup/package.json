@@ -1,0 +1,19 @@
+{
+  "name": "ai-secretary-tutorial-kit",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.15"
+  },
+  "scripts": {
+    "test": "node tests/run-all.mjs",
+    "scan": "node tools/scan-kit.mjs"
+  },
+  "dependencies": {
+    "google-auth-library": "11.1.0",
+    "nodemailer": "10.0.15"
+  },
+  "devDependencies": {
+    "wrangler": "4.141.0"
+  }
+}

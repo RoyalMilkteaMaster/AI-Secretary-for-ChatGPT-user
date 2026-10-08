@@ -1,0 +1,22 @@
+{
+  "ASSETS.md": "33b2c614b797a1fdac91fae62e4ba3b2796e41ccba128ee6a3abca495a646c66",
+  "BRIEF.md": "91f4164ae4d252ccb021c3e02c901d56e4643bf2280120493f528655b10dabc0",
+  "design.md": "69d1a5324aae61e35d095f73997ee0907644e797b841c3a7b62957606eb66a14",
+  "hyperframes.json": "bef7a8dd696b5e4616afc29367070fba15efa60622c86ce910ba6922c8da0552",
+  "index.html": "3e023b9585bf18a10ec35bcc6dcda46ba28d2cbc35f346617fd5480d1791bb12",
+  "package.json": "0476f7d3eeecff3ef9de5a7db5af28bf718a4bcddffd7d25d820dd6b80c228b6",
+  "README.md": "40925955b3780a226b28e81e3aba54beb7cf216f6820e98b49cff3a725a8232d",
+  "STORYBOARD.md": "e38d6ed1c7abd8dfa64c18b21e89741d0d6e199b59956b1ce4efb1d5a064304a",
+  "assets/gsap.min.js": "19e3ad578c9c583ddf9bdca2ad87bb55c3d70b331058e28abacab898f799b2ee",
+  "assets/robot-welcome-stage-v1.png": "5faedcb46f5327dc3332fb957f6b6ce31e9311561a21eb87cf9f1023314847c8",
+  "assets/short-music.wav": "55418ff98a754a8658cdf71343f456e6c56258cd9bdccf91c18939129afe140d",
+  "assets/short-voice.wav": "fbcd04d43358fb7886ddf255e662a69f67c3ae442b5ca2a1f0a3fde7a55583e2",
+  "assets/fonts/NotoSansTC-VF.ttf": "c6481c5d93420aeac11087367dae56ae7492eb1989ce42f4ca5d5aa5e2db3116",
+  "assets/fonts/OFL.txt": "babcfe66c8a098b2fa279bc724a3a342f8124f77ce18941fbcc1bbb39823cded",
+  "compositions/illustrated/ill-00.html": "66840be3923270f1854dcbc5042e3ad0d92e06a0b2d021e28d74328b9db1a630",
+  "compositions/illustrated/ill-01.html": "c6e6267bde560efdc8fbcc83ca6514b07d286d19b41708d403b5a4e7fdb28714",
+  "compositions/illustrated/ill-02.html": "627c5e92ea8169e9c91b3e04e06c58a38a6ef18f812566708001aeaafea0b7b9",
+  "compositions/illustrated/ill-03.html": "36e09b14cb80d9e4efe9bd20fc3bc54edd7d8cec9bd681cb63dd4cb9612ed679",
+  "compositions/illustrated/ill-04.html": "3d386f54d24ae4adfa088b2a905ad8ee9f14502276de371148fa0ac3228fe852",
+  "compositions/illustrated/ill-05.html": "b58b38d7dfae9cd4feee71d0b45abc1628b4913c1a386dd51b72d905449ab4f9"
+}

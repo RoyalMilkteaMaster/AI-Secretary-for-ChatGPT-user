@@ -1,0 +1,30 @@
+{
+  "_說明": "由 agent 複製成設定.json，詢問並核對本人帳號後填寫。使用者不必自行修改 JSON。全部用本人資料；只放帳號與服務識別，禁止放密碼、金鑰、權杖或 OAuth JSON 內容。",
+  "_何時填": {
+    "第1步": "sender、recipient、calendar（timezone 保持 Asia/Taipei）",
+    "第2步": "account_id、d1_database_id（d1_database_name、worker_name 可沿用預設）；首次部署後再填 origin",
+    "第3步": "google_project_id"
+  },
+  "_欄位說明": {
+    "sender": "專用寄件 Gmail：另外開一個只負責寄出每日總覽的 Gmail。SMTP 寄信需要對這個信箱授予 Google 的完整 Gmail 權限，所以不要用主帳號",
+    "recipient": "收件主帳號：平常收信、放個人日曆的帳號；只授權「日曆唯讀」，不授權 Gmail；不可與 sender 相同",
+    "calendar": "要讀取的個人日曆 ID；主日曆通常就是主帳號的地址。服務只讀取，不會新增、修改或刪除行程",
+    "timezone": "本版只支援 Asia/Taipei",
+    "account_id": "Cloudflare 帳戶 ID（32 位英數，可用 npx wrangler whoami 查）",
+    "d1_database_name": "D1 資料庫名稱",
+    "d1_database_id": "wrangler d1 create 顯示的 database_id（UUID）",
+    "worker_name": "Worker 名稱；服務網址會是 https://<worker_name>.<你的子網域>.workers.dev",
+    "origin": "首次部署後 Wrangler 顯示的服務網址，只填 https://主機名稱，不加斜線結尾",
+    "google_project_id": "Google Cloud 專案 ID（不是專案名稱，也不是專案編號）"
+  },
+  "sender": "",
+  "recipient": "",
+  "calendar": "",
+  "timezone": "Asia/Taipei",
+  "account_id": "",
+  "d1_database_name": "ai-secretary-progress",
+  "d1_database_id": "",
+  "worker_name": "ai-secretary-progress",
+  "origin": "",
+  "google_project_id": ""
+}

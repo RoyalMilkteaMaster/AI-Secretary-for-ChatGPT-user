@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 秘書：從零設定操作手冊（Agent 設定包）</title>
+<style>
+:root{--ink:#1f2a37;--muted:#5b6778;--line:#dfe5ee;--bg:#f6f8fb;--blue:#175bb5;--warn:#9a3412;--warnbg:#fff7ed;--ok:#14532d;--okbg:#f0fdf4;--stop:#991b1b;--stopbg:#fef2f2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.8 "Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif}
+header{background:#1d3557;color:#fff;padding:36px 24px}
+header h1{margin:0 auto;max-width:960px;font-size:30px;line-height:1.35}
+header p{margin:10px auto 0;max-width:960px;color:#dbe7f5}
+main{max-width:960px;margin:0 auto;padding:24px}
+section{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin:22px 0}
+h2{font-size:23px;margin:0 0 6px;line-height:1.4}
+h3{font-size:19px;margin:22px 0 6px}
+.shot{display:inline-block;font-size:13px;color:var(--muted);background:#eef2f7;border-radius:6px;padding:0 8px;margin-left:6px;vertical-align:middle}
+code{font-family:Consolas,"Cascadia Mono",monospace;background:#eef2f7;border-radius:5px;padding:1px 6px;font-size:15px}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:14px 16px;overflow:auto;font:15px/1.6 Consolas,"Cascadia Mono",monospace;margin:10px 0}
+pre .c{color:#94a3b8}
+.note,.warn,.stop,.ok{border-radius:10px;padding:12px 16px;margin:12px 0}
+.note{background:#eff6ff;border-left:5px solid var(--blue)}
+.warn{background:var(--warnbg);border-left:5px solid #ea580c;color:#431407}
+.stop{background:var(--stopbg);border-left:5px solid #dc2626;color:#450a0a}
+.ok{background:var(--okbg);border-left:5px solid #16a34a;color:var(--ok)}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:16px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#f1f5f9}
+nav.toc ol{columns:2;column-gap:32px;margin:6px 0;padding-left:22px}
+nav.toc a{color:var(--blue);text-decoration:none}
+ul.check{list-style:none;padding-left:4px}
+ul.check li::before{content:"☐ ";color:var(--muted)}
+.tag{font-size:13px;border-radius:6px;padding:1px 8px;margin-right:6px}
+.t-you{background:#e0f2fe;color:#075985}.t-ai{background:#ede9fe;color:#5b21b6}.t-net{background:#fee2e2;color:#991b1b}
+footer{color:var(--muted);font-size:14px;text-align:center;padding:24px}
+@media(max-width:700px){nav.toc ol{columns:1}section{padding:18px}}
+@media print{header{background:#fff;color:#000}header p{color:#333}section{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header>
+<h1>AI 秘書：從零設定到每天使用｜操作手冊</h1>
+<p>這是給 agent 閱讀的完整技術參考。請先讀「給Agent的交接指示.txt」；使用者先看圖解手冊前兩頁，需要接手時再看紅框。影片不逐步教後台操作。</p>
+</header>
+<main>
+<p><b>執行順序：</b>依第 1～8 步執行。第 7 步先完成日常使用示範及清理，第 8 步才確認並啟用每日提醒。</p>
+
+<section>
+<h2>先讀這段：這份附檔能做什麼、不能做什麼</h2>
+<div class="warn"><b>這不是一鍵安裝。</b>第一次設定需要你本人登入並授權三個服務（Cloudflare、Google、ChatGPT），也需要一位能在你電腦上執行指令的桌面助手（Codex 或 Claude Code，二選一）。助手會先說明部署和寄信範圍，取得你的同意；範圍內的必要操作接著完成。登入與 OAuth 同意仍由你本人處理。</div>
+<ul>
+<li>附檔裡的程式是原作者實際運作版本的「安全複本」：已移除原作者的信箱、帳戶 ID、資料庫 ID、網址、權杖與所有真實待辦。所有值都要換成<b>你自己的</b>。</li>
+<li>帳號不符時會拒絕授權、拒絕安裝秘密、拒絕寄信。第一次部署時<b>每日寄信一定是關閉的</b>；只有完成第 6 步驗收與第 7 步示範清理、你明確同意後，才會設定每天台灣 09:00（<code>0 1 * * *</code>）。</li>
+<li><b>日曆只讀不寫</b>：雲端服務只讀你指定的一本日曆，列出「今日行程」；ChatGPT 的「AI 秘書進度」外掛只管理待辦，<b>不會</b>新增、修改或刪除 Google 日曆。</li>
+<li>以下事項只有你本人能在自己的畫面確認，附檔與助手都無法替你保證：
+  <ul>
+  <li>你的 ChatGPT 帳號能不能建立自訂 MCP 外掛、用「預設記憶」建立專案、使用「工作模式」（第 1 步就先核對）。不同方案、地區與工作區可能不同，不要假設最便宜的訂閱一定有。</li>
+  <li>Google OAuth 的當下政策：測試／正式發布狀態、權杖期限、「Google 尚未驗證」警告；公司或學校帳戶的管理限制。</li>
+  <li>手機 Gmail App 是否顯示互動版本（請實際打開確認）。</li>
+  </ul></li>
+</ul>
+<p>標記說明：<span class="tag t-you">本人操作：</span>你本人在瀏覽器操作　<span class="tag t-ai">Agent 執行：</span>請助手執行指令　<span class="tag t-net">需同意：</span>會改變雲端帳戶或寄信，執行前要你同意</p>
+</section>
+
+<nav class="toc"><section>
+<h2>目錄</h2>
+<ol>
+<li><a href="#c01">設定包、桌面助手、兩個 Gmail</a></li>
+<li><a href="#c02">建立自己的 Cloudflare 服務</a></li>
+<li><a href="#c03">Google 寄信與唯讀日曆授權</a></li>
+<li><a href="#c04">ChatGPT：自訂 MCP、新專案、工作模式、建立並改期</a></li>
+<li><a href="#c05">開啟 Gmail 動態郵件</a></li>
+<li><a href="#c06">一封驗收信，勾選後讀回</a></li>
+<li><a href="#c07">日常使用，最後取消兩筆示範</a></li>
+<li><a href="#c08">每天台北 09:00</a></li>
+</ol>
+<p><a href="#help">附錄 A　有問題時</a>　·　<a href="#oauth">附錄 B　Google 發布狀態與長期使用</a>　·　<a href="#legacy">附錄 C　舊使用者</a>　·　<a href="#files">附錄 D　檔案清單</a>　·　<a href="#commands">附錄 E　指令總表</a>　·　<a href="#local">附錄 F　本機驗收與離線測試</a>　·　<a href="#security">附錄 G　安全設計與未驗證項目</a></p>
+</section></nav>
+
+<section id="c01">
+<h2>第 1 步　設定包、桌面助手、兩個 Gmail</h2>
+<p>設定完成後，每天台灣時間 09:00，你的雲端服務會寄一封總覽到主帳號：急件、近期截止、一般待辦，以及今天的行程。你在 ChatGPT 交辦，秘書把下一步和期限存進雲端；做完在 Gmail 信裡勾選，等畫面顯示已保存（字樣可能是「已保存」或「完成已保存」），下一封信就不會再列出它。聊天和信讀的是同一份進度。</p>
+<h3>需要準備</h3>
+<table>
+<tr><th>項目</th><th>說明</th></tr>
+<tr><td>Windows 電腦</td><td>Windows 10／11，Chrome 或 Edge。內建的 Windows PowerShell 5.1 即可。</td></tr>
+<tr><td>Node.js</td><td>v22.15 以上，建議 Node.js 24 LTS；缺少時由本人從 nodejs.org 安裝，或明確授權 agent 協助安裝，完成後核對版本。</td></tr>
+<tr><td>桌面助手（二選一）</td><td>Codex 或 Claude Code（可執行本機命令的版本），選一個就好，全程用同一個。不要讓兩個助手同時操作同一個資料夾。</td></tr>
+<tr><td>Gmail ×2</td><td><b>主帳號</b>：你平常收信、放個人日曆的帳號，只授權「日曆唯讀」。<b>專用寄件 Gmail</b>：另外新開一個，只負責寄出總覽。Google 規定 SMTP 寄信要授予<b>完整 Gmail 權限</b>，所以不要用主帳號寄信。兩個不能是同一個。</td></tr>
+<tr><td>Cloudflare 帳號</td><td>先核對目前方案與用量；若出現費用或升級要求，先說明再由本人決定。</td></tr>
+<tr><td>ChatGPT 帳號</td><td>需要能建立自訂 MCP 外掛、用預設記憶建立專案、使用工作模式。下面「前置核對」先確認。</td></tr>
+</table>
+<h3>放好設定包，交給助手</h3>
+<ol>
+<li><span class="tag t-you">本人操作：</span>把附檔解壓縮到<b>不會雲端同步</b>的資料夾，例如 <code>C:\AI秘書\</code>（不要放在 OneDrive、Google 雲端硬碟同步資料夾）。</li>
+<li><span class="tag t-you">本人操作：</span>在這個資料夾開啟你選的桌面助手，貼上「開始這裡.txt」的文字，讓 agent 自己讀取兩份交接指示。</li>
+<li><span class="tag t-ai">Agent 執行：</span>檢查環境並跑離線測試：
+<pre>node --version
+powershell.exe -NoProfile -Command "$PSVersionTable.PSVersion"
+npm install --no-audit --no-fund      <span class="c"># 安裝 package.json 鎖定的版本（會從 npm 下載）</span>
+npm test                              <span class="c"># 離線測試：不連到 Cloudflare/Google、不寄信</span></pre>
+出現錯誤先修好再往下。</li>
+</ol>
+<h3>填寫設定資料表</h3>
+<pre>copy 設定.example.json 設定.json</pre>
+<p><span class="tag t-you">本人操作：</span>把自己的帳號地址告訴 agent，由 agent 建立並填好 <code>設定.json</code>。現在先確認三欄（<code>timezone</code> 保持 <code>Asia/Taipei</code>）：</p>
+<table>
+<tr><th>欄位</th><th>填什麼</th><th>何時填</th></tr>
+<tr><td><code>sender</code></td><td>專用寄件 Gmail 地址</td><td>第 1 步</td></tr>
+<tr><td><code>recipient</code></td><td>主帳號地址</td><td>第 1 步</td></tr>
+<tr><td><code>calendar</code></td><td>個人日曆 ID；主日曆通常就是主帳號地址</td><td>第 1 步</td></tr>
+<tr><td><code>account_id</code>、<code>d1_database_id</code>、<code>origin</code></td><td>Cloudflare 帳戶 ID、D1 資料庫 ID、服務網址</td><td>第 2 步</td></tr>
+<tr><td><code>google_project_id</code></td><td>Google Cloud 專案 ID</td><td>第 3 步</td></tr>
+</table>
+<p><span class="tag t-ai">Agent 執行：</span>產生第 4 步要貼的專案指示（不連網、不部署）：</p>
+<pre>node tools\prepare.mjs --instructions-only     <span class="c"># 產生 work\專案指示.已填.txt</span></pre>
+<div class="stop">密碼、金鑰、權杖、下載的 OAuth JSON 內容，<b>不要</b>貼進聊天，也不要寫進這張資料表。工具遇到範例文字、格式錯誤或寄收件相同，會直接拒絕。</div>
+<h3>前置核對：ChatGPT 功能（先確認，再動雲端）</h3>
+<p><span class="tag t-you">本人操作：</span>用電腦瀏覽器登入 ChatGPT，確認左下角是你要用的<b>個人帳號</b>，逐項看得到嗎？</p>
+<ul class="check">
+<li>外掛程式 → 新增 → 建立自訂 MCP 伺服器（只看入口，先不要建立）</li>
+<li>新增專案時，記憶可以選「預設記憶」（不要用「僅限專案記憶」：它無法做雲端工作）</li>
+<li>輸入框可以切換「工作模式」，並在裡面選擇專案</li>
+</ul>
+<div class="stop"><b>任何一項看不到，就停在這裡。</b>不要繞過、不要改用僅限專案記憶，也不要拿你原有的專案來改。依序排查：
+<ol>
+<li>是否登入在公司、學校或團隊工作區？管理員可能關閉了自訂外掛、記憶或工作模式。切回個人帳號，或詢問管理員。</li>
+<li>改用電腦版瀏覽器開 ChatGPT 網頁、重新整理；必要時登出再登入。</li>
+<li>設定 → 個人化 → 記憶：確認個人記憶沒有關閉。</li>
+<li>請 agent 依目前官方說明及你實際看到的畫面核對必要設定；不要猜測不存在的入口或開關。</li>
+<li>設定 → 帳戶：查看自己的方案。功能依方案、地區與工作區而不同，不要假設任何方案一定支援。</li>
+<li>仍沒有：到 OpenAI 說明中心查詢或聯絡支援。功能出現之前，第 4 步無法完成。</li>
+</ol></div>
+</section>
+
+<section id="c02">
+<h2>第 2 步　建立自己的 Cloudflare 服務</h2>
+<h3>登入 Cloudflare</h3>
+<p><span class="tag t-you">本人操作：</span>先在瀏覽器登入自己的 Cloudflare。<span class="tag t-ai">Agent 執行：</span><span class="tag t-net">需同意：</span></p>
+<pre>npx wrangler login       <span class="c"># 瀏覽器出現確認頁：核對帳號與權限後，由你本人按允許</span>
+npx wrangler whoami      <span class="c"># 顯示 Account ID → 填入 設定.json 的 account_id</span></pre>
+<h3>建立空白 D1</h3>
+<pre>npx wrangler d1 create ai-secretary-progress
+<span class="c"># 可選：加 --location apac。輸出的 database_id → 填入 設定.json 的 d1_database_id</span>
+node tools\prepare.mjs                <span class="c"># 產生工作副本；第一次一定是 DAILY_ENABLED=false、crons=[]</span>
+node tools\d1-init.mjs --check        <span class="c"># 只檢查：三份檔案只含 CREATE TABLE IF NOT EXISTS</span>
+node tools\d1-init.mjs                <span class="c"># 依序匯入 schema.sql → mail-deliveries.sql → production.sql</span></pre>
+<p>三份都是空白表格結構，沒有任何待辦或示範資料。重跑安全：已存在的表格不會被改動。</p>
+<h3>第一次部署，排程保持關閉</h3>
+<pre>node tools\deploy.mjs --check         <span class="c"># 列出將部署到哪個帳戶、哪個 D1；不連網</span>
+node tools\deploy.mjs                 <span class="c"># 對外：部署 Worker</span></pre>
+<p>Wrangler 會顯示服務網址，形式像 <code>https://&lt;worker_name&gt;.&lt;你的子網域&gt;.workers.dev</code>（帳戶第一次使用 workers.dev 時，可能請你先選一個自己的子網域）。<span class="tag t-ai">Agent 執行：</span>把網址填入 <code>設定.json</code> 的 <code>origin</code>（只填 <code>https://主機名稱</code>，結尾不加斜線），再做一次：</p>
+<pre>node tools\prepare.mjs
+node tools\deploy.mjs</pre>
+<p>首次部署時 origin 還是空白，服務只開放首頁、<code>/privacy</code>、<code>/health</code>；填好 origin 重新部署後，私人路由才會開啟。<span class="tag t-you">本人操作：</span>瀏覽器開啟服務網址與「服務網址<code>/privacy</code>」，兩頁都要能打開；這兩個網址第 3 步要填進 Google。</p>
+<h3>簽章密鑰 SIGNING_SECRET</h3>
+<pre>node tools\signing-secret.mjs         <span class="c"># 對外：本機產生（Windows 加密保存），經 stdin 管道安裝到 Worker</span></pre>
+<p>你只會看到「已產生」「已安裝」，不會看到密鑰本身。重跑不會換掉既有密鑰；只有加 <code>--rotate</code> 才會換新（舊信勾選與未用的連結碼會失效）。</p>
+</section>
+
+<section id="c03">
+<h2>第 3 步　Google 寄信與唯讀日曆授權</h2>
+<p>具備已授權瀏覽器工具時，由 agent 協助導航及一般表單；沒有工具時由本人操作。服務條款、帳單及其他同意畫面由本人處理。</p><table>
+<tr><th>帳號</th><th>授權範圍</th><th>用途</th></tr>
+<tr><td>專用寄件 Gmail（<code>sender</code>）</td><td>完整 Gmail 權限 <code>https://mail.google.com/</code>（Google 對 SMTP 的要求）</td><td>只用來寄出總覽</td></tr>
+<tr><td>主帳號（<code>recipient</code>）</td><td>日曆事件唯讀 <code>calendar.events.readonly</code></td><td>只讀設定中那一本日曆的今日行程；不新增、修改或刪除</td></tr>
+</table>
+<h3>建立 Google 應用程式</h3>
+<ol>
+<li><span class="tag t-ai">Agent 協助：</span>有授權瀏覽器工具時可協助，否則本人操作。Google Cloud Console → 新增專案（名稱可取「AI 秘書」）。確認上方選到這個專案，在 API 程式庫分別啟用 <b>Gmail API</b> 與 <b>Google Calendar API</b>。把<b>專案 ID</b>（不是名稱、不是編號）填入 <code>google_project_id</code>。</li>
+<li><span class="tag t-ai">Agent 協助：</span>有授權瀏覽器工具時可協助，否則本人操作。Google Auth Platform → 品牌：應用程式名稱、你自己的支援信箱與聯絡信箱；應用程式首頁填你的服務網址，隱私權政策填「服務網址/privacy」。<b>不要照抄圖解截圖或範例中的網址。</b></li>
+<li><span class="tag t-ai">Agent 協助：</span>有授權瀏覽器工具時可協助，否則本人操作。目標對象（Audience，舊介面可能叫「受眾」）：使用者類型選「外部」。發布狀態是「測試中」時，把<b>寄件帳號與主帳號</b>都加入測試使用者。要不要轉正式版，先看下面「發布狀態與 7 天」。</li>
+<li><span class="tag t-you">本人操作：</span>用戶端 → 建立 OAuth 用戶端，類型選<b>網頁應用程式</b>，授權重新導向網址完整填入：
+<pre>http://localhost:8766/oauth/callback</pre>
+建立後下載 JSON，留在自己的電腦。</li>
+</ol>
+<p><span class="tag t-ai">Agent 執行：</span></p>
+<pre>node tools\prepare.mjs
+node tools\import-google-client.mjs "C:\Users\你的使用者名稱\Downloads\下載的檔名.json"</pre>
+<p>工具會核對專案 ID、類型與回呼網址；通過後以 Windows 加密保存，不列印內容。匯入成功後可把下載的 JSON 刪除或移到安全位置。</p>
+<h3>發布狀態與 7 天（先決定）</h3>
+<div class="warn">Google 官方說明：使用者類型「外部」且發布狀態「測試中」的專案，取得的 refresh token <b>7 天後失效</b>；只要求姓名、電子郵件、基本資料的應用程式才例外，本教材的 Gmail 與 Calendar 不在例外內。（<a href="https://developers.google.com/identity/protocols/oauth2">Google OAuth 2.0 說明</a>）</div>
+<ul>
+<li><b>只想先試</b>：保持測試中即可，但約 7 天後寄信與日曆會停止，需要轉正式並重新授權。</li>
+<li><b>要長期使用</b>：目標對象 → 發布應用程式（Publish app），從「測試中」改為「正式版」（In production）。確定要長用的話，可以在下面授權<b>之前</b>就轉，省一次重新授權；若已在測試中授權，轉正式後照<a href="#oauth">附錄 B</a> 重新授權兩個帳號。</li>
+</ul>
+<p>詳細說明（未驗證警告、100 人以下的自用例外、權杖仍可能失效的情況）見<a href="#oauth">附錄 B</a>。</p>
+<h3>先授權專用寄件 Gmail</h3>
+<pre>node tools\authorize.mjs --smtp</pre>
+<p><span class="tag t-you">本人操作：</span>瀏覽器開啟 <code>http://localhost:8766/start</code>，<b>登入專用寄件 Gmail</b>。若出現「Google 尚未驗證這個應用程式」，先確認畫面上是你自己建立的應用程式名稱，才點「進階」繼續。成功頁出現後，助手會回報已加密保存。</p>
+<div class="warn">完整 Gmail 權限能讀取、傳送與永久刪除該信箱的郵件；程式實際只核對帳號與寄信。這就是要用「專用寄件 Gmail」、不用主帳號的原因。若帳號政策禁止這項授權，先處理帳號或政策，不要略過錯誤。</div>
+<h3>再授權主帳號的日曆（唯讀）</h3>
+<p>第一個流程完成後，才啟動第二個（兩個會搶同一個本機埠）。</p>
+<pre>node tools\authorize.mjs --calendar</pre>
+<p><span class="tag t-you">本人操作：</span>再開 <code>http://localhost:8766/start</code>，這次<b>改登入主帳號</b>。範圍只有日曆事件唯讀。</p>
+<div class="ok">兩個授權都會核對 Google 回報的「實際帳號」：登入錯帳號時不會保存任何憑證，會顯示「帳號不符」。已經有授權時也不會被覆蓋；要重新授權需加 <code>--replace</code>。</div>
+<h3>安裝到自己的 Worker</h3>
+<pre>node tools\install-secrets.mjs        <span class="c"># 對外：經 stdin 管道安裝 6 個秘密</span>
+node tools\admin.mjs status           <span class="c"># 核對狀態（不含秘密）</span></pre>
+<p><code>status</code> 裡 <code>mail_credentials_installed</code>、<code>mail_accounts_match_settings</code>、<code>calendar_connected</code> 都應該是 <code>true</code>，<code>schedule_enabled</code> 仍是 <code>false</code>。</p>
+</section>
+
+<section id="c04">
+<h2>第 4 步　ChatGPT：自訂 MCP、新專案、工作模式、建立並改期同一筆</h2>
+<h3>新建「AI 秘書」專案</h3>
+<ol>
+<li><span class="tag t-you">本人操作：</span>ChatGPT 側邊欄 → 新增專案，名稱「AI 秘書」，記憶選<b>預設記憶</b>（不要選「僅限專案記憶」，它無法做雲端工作）。<b>新建一個</b>，不要修改你原有的專案。</li>
+<li><span class="tag t-you">本人操作：</span>專案設定 → 把 <code>work\專案指示.已填.txt</code> 整份貼進指示欄位（由 agent 依自己的設定產生，不必自行修改範本）。</li>
+</ol>
+<h3>建立自訂 MCP 外掛</h3>
+<p><span class="tag t-you">本人操作：</span>外掛程式 → 新增 → 建立自訂 MCP 伺服器，填入：</p>
+<table>
+<tr><th>名稱</th><td>AI 秘書進度</td></tr>
+<tr><th>伺服器 URL</th><td>你的服務網址加上 <code>/mcp</code>；由 Agent 從部署結果填入，不照抄範例。</td></tr>
+<tr><th>身分驗證</th><td>OAuth</td></tr>
+</table>
+<p>閱讀風險說明後，由本人勾選「我已瞭解並希望繼續」。進階 OAuth 設定先保持預設，最後按「<b>建立為外掛程式</b>」。</p>
+<h3>私人授權頁與 5 分鐘連結碼</h3>
+<ol>
+<li><span class="tag t-you">本人操作：</span>接著會打開你自己服務的授權頁。把頁面上的「<b>請求識別</b>」（43 個字元）整串複製給助手。這串不是秘密。</li>
+<li><span class="tag t-ai">Agent 執行：</span>
+<pre>node tools\admin.mjs approve 貼上請求識別</pre>
+一次性連結碼只會放進你電腦的剪貼簿，不會顯示在聊天裡。</li>
+<li><span class="tag t-you">本人操作：</span>在授權頁的「<b>一次性連結碼</b>」欄位貼上 → 按「授權這次連線」。</li>
+</ol>
+<div class="warn">連結碼不要貼進任何聊天，也不要拍進錄影：正在錄影的話，貼上前先暫停或遮住畫面（欄位本身會以圓點遮蔽）。碼 5 分鐘內有效、只能用一次、只對這次請求有效；過期就重新開始連線、取得新的請求識別。剪貼簿不能用時可改 <code>approve 請求識別 --file</code>，碼會寫在 <code>work\private\</code>，用完刪除。</div>
+<h3>用工作模式選專案與外掛</h3>
+<p><span class="tag t-you">本人操作：</span>切換到<b>工作模式</b> → 選擇專案「AI 秘書」→ 選「AI 秘書進度」外掛。聊天拿不到工具時，先確認這三項，再重開聊天。</p>
+<h3>建立一筆，再改期同一筆</h3>
+<p>在這個聊天直接貼：</p>
+<pre>教材示範：用「AI 秘書進度」新增一筆待辦。
+ID：DEMO_COURSE_APPLY_V5
+標題：【教材示範】寄出課程報名資料
+活動：教材示範｜課程報名
+截止：2026-10-16 18:00（台北時間）
+kind=task。保存後讀回給我看。</pre>
+<p>要看到工具真的執行，並讀回 ID、標題、截止、狀態。只有一句「好的，我會記住」不算通過。接著：</p>
+<pre>DEMO_COURSE_APPLY_V5 改到 2026-10-19 18:00。更新原本那一筆，不要新增；
+改完用 list_steps 查回，確認「【教材示範】寄出課程報名資料」只有一筆。</pre>
+<ul class="check"><li>新增成功並讀回 2026-10-16</li><li>同一個 ID 改為 2026-10-19 並讀回</li><li>查回只有一筆，沒有重複</li></ul>
+<p class="note">若你操作時這些日期已經過去，可改用未來日期，ID 與標題保持不變。不要用 <code>kind=test</code>：test 永遠不會進信。</p>
+</section>
+
+<section id="c05">
+<h2>第 5 步　開啟 Gmail 動態郵件</h2>
+<ol>
+<li><span class="tag t-you">本人操作：</span>用電腦開<b>主帳號</b>的 Gmail 網頁 → 齒輪 → 查看所有設定 → 一般 → 動態郵件：勾選啟用。</li>
+<li>同一處的開發人員設定 → 把<b>專用寄件 Gmail</b> 加入允許的寄件者 → 頁面最下方按儲存。填的是寄件地址，不是主帳號或服務網址。</li>
+</ol>
+<p>這是你自己的收件帳號允許你自己的寄件者，不代表取得公開寄送認證。這一步<b>不寄信</b>，每日排程也保持關閉。</p>
+<div class="note">看信請用 Gmail 網頁或 Gmail App。Apple Mail 等其他郵件 App 只會顯示一般版本，不能在信裡勾選。</div>
+</section>
+
+<section id="c06">
+<h2>第 6 步　一封驗收信，勾選後讀回</h2>
+<h3>先預覽，再寄唯一一封</h3>
+<p><span class="tag t-ai">Agent 執行：</span></p>
+<pre>node tools\admin.mjs preview                            <span class="c"># 只預覽，不寄信</span>
+node tools\admin.mjs send-validation                    <span class="c"># 列出寄件、收件、事項與行程數，不寄信</span></pre>
+<p><span class="tag t-you">本人操作：</span>核對：收件者是你的主帳號、寄件者是專用寄件 Gmail、<code>DEMO_COURSE_APPLY_V5</code> 的日期是改期後的 2026-10-19。確認無誤、明確同意後，助手才執行：</p>
+<pre>node tools\admin.mjs send-validation --confirm-one-email   <span class="c"># 對外：寄出今天唯一一封驗收信</span></pre>
+<div class="warn">驗收信以日期去重，<b>每天最多一封</b>。結果是 <code>uncertain_or_failed</code> 也不要重寄：先查收件匣、垃圾郵件和 status。之後一律用同一封信與 preview 核對；真的需要另一封，等隔天。<code>local-acceptance</code> 的離線假收件<b>不是</b> Gmail 驗收。</div>
+<h3>在信裡勾選，關閉重開</h3>
+<ol>
+<li><span class="tag t-you">本人操作：</span>在 Gmail 打開剛收到的「總覽驗收」，確認寄件者是自己的專用 Gmail；若在垃圾郵件匣，先標示為非垃圾郵件。</li>
+<li>勾選「【教材示範】寄出課程報名資料」，等畫面出現已保存的確認（字樣可能是「已保存」或「完成已保存」）。</li>
+<li>關閉這封信再重開，完成狀態仍在。</li>
+</ol>
+<p>從寄信到勾選之間不要修改這筆事項：信裡的勾選綁定寄出當時的版本。</p>
+<h3>聊天讀回，下一封排除</h3>
+<pre>（在原聊天）請讀回 DEMO_COURSE_APPLY_V5 的狀態，再預覽下一封總覽，確認它已被排除。</pre>
+<pre>node tools\admin.mjs preview                            <span class="c"># 助手端也確認一次</span></pre>
+<ul class="check"><li>信內勾選顯示已保存，重開仍在</li><li>聊天讀回 completed</li><li>下一封預覽已排除這一筆</li></ul>
+<p>若沒有保存或重開後消失，先不要往下，請助手讀回並查 status。這是下一封的預覽，不是隔天實際收到的信。</p>
+</section>
+
+<section id="c07">
+<h2>第 7 步　日常使用，最後取消兩筆示範</h2>
+<h3>每天怎麼用</h3>
+<ul>
+<li><b>一件活動一個聊天</b>（工作模式、選「AI 秘書」專案與「AI 秘書進度」外掛）。交辦三件事：活動、下一步、期限；日期不明時讓秘書先問清楚。</li>
+<li><b>早上看信</b>：先看急件與近期截止，再看一般待辦，對照今日行程。信只整理已保存的進度。</li>
+<li><b>延期、取消、完成都要保存並讀回</b>；也可以直接在信裡勾選，兩邊最後應看到同一個狀態。</li>
+<li><b>行程要自己改</b>：日曆是唯讀的，秘書不會替你新增或改期行程。會議改了，到 Google 日曆修改，再請秘書更新相關待辦。</li>
+</ul>
+<h3>做完一步，交辦下一步</h3>
+<p>在第 4 步的同一個聊天：</p>
+<pre>報名資料已經寄出。下一步請新增一筆：
+ID：DEMO_COURSE_RECEIPT_V5
+標題：【教材示範】確認主辦單位收到資料
+活動：教材示範｜課程報名
+截止：2026-10-20 18:00（台北時間）
+kind=task。DEMO_COURSE_APPLY_V5 保持 completed，不要改動。保存後讀回。</pre>
+<h3>整段完成後，只取消這兩筆</h3>
+<p>完成示範後、啟用第 8 步之前，<span class="tag t-ai">Agent 執行：</span><span class="tag t-net">需同意：</span></p>
+<pre>node tools\admin.mjs cancel-demo      <span class="c"># 只取消 DEMO_COURSE_APPLY_V5、DEMO_COURSE_RECEIPT_V5，逐筆讀回</span></pre>
+<pre>（在原聊天）讀回 DEMO_COURSE_APPLY_V5 和 DEMO_COURSE_RECEIPT_V5，確認兩筆都是 cancelled。</pre>
+<ul class="check"><li>兩筆讀回都是 cancelled</li><li>你自己的其他事項沒有變動</li></ul>
+<div class="note">取消不是刪除：紀錄保留，但不會再出現在每日信。已完成的那筆會變成 cancelled，不會被改回 pending。<code>cancel-demo</code> 預設只處理這兩個 ID；ID 不是 <code>DEMO_</code> 開頭、或標題不是「【教材示範】」開頭時，整批都不會變更。</div>
+<p class="ok">從今天的一件小事開始：交辦 → 保存並讀回；收信 → 決定今天做什麼；完成 → 確認已保存。</p>
+</section>
+
+<section id="c08">
+<h2>第 8 步　每天台北 09:00</h2>
+<h3>啟用前總檢查</h3>
+<pre>node tools\admin.mjs ready-check</pre>
+<p>逐項列出：排程仍關閉、寄件／收件／日曆與設定一致、寄信憑證已安裝、日曆已連接、至少一封驗收信被接受、沒有進行中的示範事項，以及<b>你本人確認</b>第 6 步的人工項目。你確認全部通過後，告訴助手「通過，啟用」，助手才執行：</p>
+<pre>node tools\admin.mjs ready-check --human-checks-passed   <span class="c"># 保存驗收紀錄（7 天內有效）</span>
+node tools\prepare.mjs --enable-daily                    <span class="c"># DAILY_ENABLED=true、crons=["0 1 * * *"]</span>
+node tools\deploy.mjs --check
+node tools\deploy.mjs                                    <span class="c"># 對外：重新部署</span>
+node tools\admin.mjs status                              <span class="c"># schedule_enabled 應為 true</span></pre>
+<div class="note"><code>--enable-daily</code> 只在驗收紀錄存在、通過、經你確認、與目前設定相符、7 天內產生時才會成功。之後若修改了帳號或服務欄位，prepare 會自動把每日寄信改回關閉，需要重新驗收。</div>
+<h3>核對排程</h3>
+<p><span class="tag t-you">本人操作：</span>Cloudflare → 你的 Worker → 設定 → 觸發器：只應有一個 Cron <code>0 1 * * *</code>（UTC 01:00＝台灣 09:00）。五個欄位都要核對，第一個數字不是 <code>*</code>。</p>
+<h3>以第一次 09:00 的實際收件為準</h3>
+<p>在下一個台灣 09:00 之前，只能說「已排程」。時間過後看收件匣，再請助手查回服務狀態，確認有 <code>daily:日期</code>、狀態 <code>accepted</code> 的紀錄。電腦不必開著。教材的收信畫面只代表拍攝當時的測試，你的環境以你自己收到的這一封為準。</p>
+<p>把 <code>設定.json</code> 與整個教材資料夾（含 <code>.secrets\</code>、<code>work\</code>）留在自己的電腦，之後重新授權會用到。不要上傳、分享或放進雲端同步資料夾。以前設過其他每日排程的人，見<a href="#legacy">附錄 C</a>。</p>
+</section>
+
+<section id="help">
+<h2>附錄 A　有問題時</h2>
+<table>
+<tr><th>狀況</th><th>依序檢查</th></tr>
+<tr><td>九點沒收到信</td><td>1. 垃圾郵件　2. <code>node tools\admin.mjs status</code> 看當天 <code>daily:日期</code>　3. 沒有紀錄 → 查 <code>schedule_enabled</code> 與 Cloudflare 觸發器　4. 有 <code>uncertain_or_failed</code> → 查寄信授權。<b>不要連續重寄。</b></td></tr>
+<tr><td>大約 7 天後突然寄不出、或日曆讀不到</td><td>多半是「測試中」的權杖到期。照<a href="#oauth">附錄 B</a> 轉正式並重新授權。</td></tr>
+<tr><td>信裡沒有勾選格</td><td>用 Gmail 網頁或 Gmail App 開信？主帳號已開動態郵件？允許的寄件地址與 sender 完全一致？組織帳號可能受管理政策限制。</td></tr>
+<tr><td>按了沒保存</td><td>不要當成已完成。回原聊天讀回同一筆；仍未完成再檢查網路與 <code>status</code>。超過 7 天或事項已被修改的舊信無法再勾，請用最新的信。</td></tr>
+<tr><td>聊天拿不到工具</td><td>確認是工作模式、選了「AI 秘書」專案、選了「AI 秘書進度」外掛；重開聊天。外掛頁顯示已連線，不代表每個舊聊天都在用它。</td></tr>
+<tr><td>聊天說「已保存」但信裡沒有</td><td>請它用工具讀回；確認是 <code>kind=task</code>、沒有暫停、<code>not_before</code> 已到。</td></tr>
+<tr><td>寄信授權過期</td><td><pre>node tools\authorize.mjs --smtp --replace       （登入專用寄件 Gmail）
+node tools\install-secrets.mjs --only smtp</pre></td></tr>
+<tr><td>日曆授權過期</td><td><pre>node tools\authorize.mjs --calendar --replace   （登入主帳號）
+node tools\install-secrets.mjs --only calendar</pre></td></tr>
+<tr><td>換了 OAuth 用戶端</td><td><pre>node tools\import-google-client.mjs "新 JSON 路徑" --replace
+node tools\authorize.mjs --smtp --replace
+node tools\authorize.mjs --calendar --replace
+node tools\install-secrets.mjs --only client,smtp,calendar</pre></td></tr>
+<tr><td>想暫停每日信</td><td><pre>node tools\prepare.mjs --disable-daily
+node tools\deploy.mjs</pre></td></tr>
+</table>
+<p>不要把完整權杖貼進聊天當除錯資訊。不要為了修問題刪除 D1、清空資料表或換新 SIGNING_SECRET。</p>
+</section>
+
+<section id="oauth">
+<h2>附錄 B　Google 發布狀態與長期使用</h2>
+<ul>
+<li><b>測試中＝7 天</b>：外部＋測試中的專案，含 Gmail、Calendar 範圍的 refresh token 7 天後失效（<a href="https://developers.google.com/identity/protocols/oauth2">Google OAuth 2.0 說明</a>）。</li>
+<li><b>轉正式版</b>：Google Auth Platform → 目標對象 → 發布應用程式，狀態改為「正式版」。如果你在測試中時已經授權過，轉正式後請重新授權並重裝：
+<pre>node tools\authorize.mjs --smtp --replace       （登入專用寄件 Gmail）
+node tools\authorize.mjs --calendar --replace   （登入主帳號）
+node tools\install-secrets.mjs --only smtp,calendar
+node tools\admin.mjs status</pre></li>
+<li><b>未驗證警告與費用</b>：正式版的自用程式，授權時可能看到「Google 尚未驗證這個應用程式」。Google 對自用、使用者少於 100 人的情況列有驗證例外（<a href="https://support.google.com/cloud/answer/13464323?hl=en">Google Cloud 說明</a>），所以<b>不是</b>每個人都必須做昂貴的驗證或安全評估。但這個例外不會讓測試中的權杖變成永久，也不保證畫面不出現其他要求；請以你看到的 Google 實際提示為準。</li>
+<li><b>沒有「永不失效」</b>：即使是正式版，Google 文件也列出權杖會失效的情況，例如你撤銷授權、長時間未使用、含 Gmail 範圍的帳號變更密碼、管理員限制等。失效時照附錄 A 重新授權即可，進度資料不受影響。</li>
+</ul>
+</section>
+
+<section id="legacy">
+<h2>附錄 C　舊使用者：清理舊排程與舊示範</h2>
+<p>第一次安裝的人可以跳過。</p>
+<ul>
+<li><b>舊排程</b>：如果你以前在 ChatGPT 設過同用途的「每天九點巡查」，等第 8 步排程確認後，再停用那個舊任務，避免一天收到兩封。其他不相關的排程照常保留。</li>
+<li><b>舊版示範事項</b>：舊教材的 <code>DEMO_TUTORIAL_CHAT</code>、<code>DEMO_TUTORIAL_EMAIL</code> 不會被預設的 <code>cancel-demo</code> 處理。確認後明確指定：
+<pre>node tools\admin.mjs cancel-demo --ids DEMO_TUTORIAL_CHAT,DEMO_TUTORIAL_EMAIL</pre></li>
+</ul>
+</section>
+
+<section id="files">
+<h2>附錄 D　檔案清單</h2>
+<table>
+<tr><th>路徑</th><th>用途</th></tr>
+<tr><td><code>操作手冊.html</code></td><td>完整 HTML 技術參考；PDF 隨整份 GitHub ZIP 提供，位於 docs/AI秘書完整操作圖解.pdf（從 setup 內讀取則用 ../docs/）</td></tr>
+<tr><td><code>開始這裡.txt</code></td><td>使用者貼給 agent 的入口文字</td></tr><tr><td><code>給Agent的交接指示.txt</code></td><td>Agent 先讀的分工與階段順序</td></tr><tr><td><code>助手交接指示.txt</code></td><td>由 agent 讀取的界線、前置核對與指令順序</td></tr>
+<tr><td><code>專案指示.txt</code></td><td>貼進 ChatGPT「AI 秘書」專案的指示範本</td></tr>
+<tr><td><code>設定.example.json</code></td><td>設定資料表範本（複製成 <code>設定.json</code>）</td></tr>
+<tr><td><code>app-template\</code></td><td>Worker 程式安全複本；<code>owner-config.mjs</code> 是未設定的佔位檔，未設定時服務拒絕寄信與私人路由</td></tr>
+<tr><td><code>schema\</code></td><td>三份空白表格結構</td></tr>
+<tr><td><code>tools\prepare.mjs</code></td><td>只產生工作副本與設定；不部署、不連網、不碰秘密</td></tr>
+<tr><td><code>tools\deploy.mjs</code>
+<code>d1-init.mjs</code></td><td>部署、建立空白表格（都有 <code>--check</code>）</td></tr>
+<tr><td><code>tools\signing-secret.mjs</code></td><td>產生並安裝 SIGNING_SECRET</td></tr>
+<tr><td><code>tools\import-google-client.mjs</code>
+<code>authorize.mjs</code>
+<code>install-secrets.mjs</code></td><td>Google 用戶端匯入、授權、秘密安裝</td></tr>
+<tr><td><code>tools\admin.mjs</code></td><td>approve、status、preview、send-validation、ready-check、cancel-demo，以及備用的 create-demo</td></tr>
+<tr><td><code>tools\local-acceptance.mjs</code></td><td>本機專用驗收（離線）</td></tr>
+<tr><td><code>tools\scan-kit.mjs</code></td><td>教材敏感資料掃描與 SHA-256 清單</td></tr>
+<tr><td><code>tests\</code></td><td>離線測試（<code>npm test</code>）</td></tr>
+<tr><td><code>reports\</code></td><td>離線驗證報告、完整性與秘鑰掃描報告、與原程式差異</td></tr>
+</table>
+<p>執行後才會出現、<b>不要分享</b>的資料夾：<code>設定.json</code>、<code>work\</code>（產生的副本與 <code>work\private\</code> 預覽、驗收紀錄）、<code>.secrets\</code>（Windows 加密憑證）、<code>node_modules\</code>。</p>
+</section>
+
+<section id="commands">
+<h2>附錄 E　指令總表</h2>
+<table>
+<tr><th>指令</th><th>做什麼</th><th>對外？</th></tr>
+<tr><td><code>npm test</code></td><td>離線測試</td><td>否</td></tr>
+<tr><td><code>node tools\prepare.mjs [--instructions-only | --enable-daily | --disable-daily]</code></td><td>產生工作副本／專案指示；切換每日寄信開關（需另外 deploy）</td><td>否</td></tr>
+<tr><td><code>node tools\deploy.mjs [--check]</code></td><td>部署</td><td>是</td></tr>
+<tr><td><code>node tools\d1-init.mjs [--check]</code></td><td>建立空白表格</td><td>是</td></tr>
+<tr><td><code>node tools\signing-secret.mjs [--generate-only | --rotate]</code></td><td>簽章密鑰</td><td>是</td></tr>
+<tr><td><code>node tools\import-google-client.mjs 路徑 [--replace]</code></td><td>匯入 OAuth 用戶端</td><td>否（本機加密）</td></tr>
+<tr><td><code>node tools\authorize.mjs --smtp | --calendar [--replace]</code></td><td>Google 授權</td><td>是（Google 授權）</td></tr>
+<tr><td><code>node tools\install-secrets.mjs [--only accounts,client,smtp,calendar]</code></td><td>安裝秘密</td><td>是</td></tr>
+<tr><td><code>node tools\admin.mjs approve 請求識別 [--file]</code></td><td>MCP 一次性連結碼（放本機剪貼簿）</td><td>否</td></tr>
+<tr><td><code>node tools\admin.mjs status | preview</code></td><td>狀態、預覽（不寄信）</td><td>讀取</td></tr>
+<tr><td><code>node tools\admin.mjs send-validation [--confirm-one-email]</code></td><td>先列出內容與收件者；加旗標才寄（每天最多一封）</td><td>是（寄信）</td></tr>
+<tr><td><code>node tools\admin.mjs ready-check [--human-checks-passed]</code></td><td>啟用前總檢查</td><td>讀取</td></tr>
+<tr><td><code>node tools\admin.mjs cancel-demo [--ids DEMO_A,DEMO_B]</code></td><td>只取消兩筆教材示範（或明確指定的 DEMO_ ID）並讀回</td><td>是（寫入你的 D1）</td></tr>
+<tr><td><code>node tools\admin.mjs create-demo</code></td><td>備用：建立 <code>DEMO_COURSE_APPLY_V5</code>（主線請在 ChatGPT 建立）</td><td>是（寫入你的 D1）</td></tr>
+<tr><td><code>node tools\local-acceptance.mjs</code></td><td>本機專用驗收</td><td>否</td></tr>
+<tr><td><code>node tools\scan-kit.mjs</code></td><td>敏感資料掃描</td><td>否</td></tr>
+</table>
+</section>
+
+<section id="local">
+<h2>附錄 F　本機專用驗收與離線測試</h2>
+<p><b>本機專用驗收</b>使用 prepare 產生的<b>同一份正式程式</b>，接上記憶體資料庫、離線寄信替身與虛構日曆，照教材順序演練：建立 <code>DEMO_COURSE_APPLY_V5</code>（2026-10-16）→ 同一筆改 2026-10-19 → 查回只有一筆 → 預覽 → 未確認不寄 → 「寄」一封（只存在本機）→ 同日第二次被拒 → 勾選保存、重開仍在 → 讀回 completed → 下一封預覽排除 → 新增 <code>DEMO_COURSE_RECEIPT_V5</code>（2026-10-20）→ 只取消這兩筆並讀回 → 排程關閉不寄。</p>
+<pre>node tools\prepare.mjs
+node tools\local-acceptance.mjs</pre>
+<div class="warn">本機驗收是離線假收件，不是 Gmail 實際收信，也不能拿來通過 ready-check。第 6 步仍要在自己的帳號完成實際收信與勾選。</div>
+<p><b>離線測試</b>（<code>npm test</code>）在 <code>tests\.tmp</code> 建立拋棄式副本，用虛構值檢查：設定驗證與未填不可部署、錯誤帳號拒絕、無秘密洩漏、prepare 重跑不覆蓋授權、驗收守門、cancel-demo 只處理指定示範，以及與原程式的回歸測試；在 Windows 上另外檢查 DPAPI 加密儲存。</p>
+</section>
+
+<section id="security">
+<h2>附錄 G　安全設計與未驗證項目</h2>
+<h3>安全設計</h3>
+<ul>
+<li><b>固定帳號防護保留</b>：寄信前比對 Worker 上的寄件／收件與設定；授權時比對 Google 回報的實際帳號；安裝秘密前比對帳號、範圍、用戶端與專案；勾選請求只接受設定的寄件者。</li>
+<li><b>未設定即拒絕</b>：佔位設定、首次部署（尚無 origin）或部署變數與設定不符時，寄信、勾選、MCP、OAuth、管理請求一律拒絕，排程也不寄。</li>
+<li><b>秘密只走加密儲存與管道</b>：本機用 Windows DPAPI，安裝時經 stdin 交給 <code>wrangler secret put</code>，不出現在命令參數或輸出。一次性連結碼只放本機剪貼簿。</li>
+<li><b>每日寄信需明確啟用</b>：預設關閉；啟用需要相符的驗收紀錄與本人確認；帳號欄位一改就自動關閉。</li>
+<li><b>不重寄</b>：每日信與驗收信各以日期去重；結果不確定時不自動重寄。</li>
+<li><b>示範清理有範圍</b>：<code>cancel-demo</code> 只處理指定 ID，先全部檢查再變更，不會把已完成改回 pending，也不是刪除。</li>
+</ul>
+<h3>這份附檔沒有、也不能替你驗證的事</h3>
+<ul>
+<li>沒有在任何新的 Cloudflare 或 Google 帳戶上用這份複本實際部署或授權；離線測試只用虛構資料。</li>
+<li>Wrangler 4.141.0 的實際安裝、登入、<code>d1 execute --remote</code>、<code>secret put</code> 經管道輸入、<code>triggers.crons</code> 的雲端行為，需要在你的帳戶實際執行時確認。</li>
+<li>Google OAuth 政策、Gmail 動態郵件在你的帳戶與手機上的顯示。</li>
+<li>ChatGPT 自訂 MCP 外掛、預設記憶專案與工作模式是否對你的帳號開放。</li>
+</ul>
+</section>
+
+<section><h2>參考資料</h2><p><a href="https://help.openai.com/en/articles/10169521-projects-in-chatgpt">OpenAI：ChatGPT 專案</a> · <a href="https://developers.google.com/identity/protocols/oauth2">Google：OAuth 2.0 與 refresh token 期限</a> · <a href="https://support.google.com/cloud/answer/13464323?hl=en">Google Cloud：驗證例外</a></p></section></main>
+<footer>AI 秘書Agent 設定包｜操作手冊。帳號、專案名稱與服務網址都必須換成你自己的。</footer>
+</body>
+</html>

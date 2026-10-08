@@ -1,0 +1,7 @@
+# 個人設定、產生的工作副本、加密憑證與測試暫存不應進入版本庫或被分享
+設定.json
+work/
+.secrets/
+node_modules/
+.wrangler/
+tests/.tmp/

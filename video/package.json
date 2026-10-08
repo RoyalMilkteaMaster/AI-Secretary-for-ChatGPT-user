@@ -1,0 +1,10 @@
+{
+  "name": "ai-secretary-film",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preview": "npx --yes hyperframes@0.8.141 preview",
+    "check": "npx --yes hyperframes@0.8.141 check",
+    "render": "npx --yes hyperframes@0.8.141 render --strict --quality delivery --fps 30 -o renders/ai-secretary-intro.mp4"
+  }
+}

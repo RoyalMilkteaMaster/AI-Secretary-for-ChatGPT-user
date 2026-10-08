@@ -1,0 +1,3 @@
+* text=auto
+# Preserve the exact bytes verified in video/SHA256SUMS.json.
+video/** -text
