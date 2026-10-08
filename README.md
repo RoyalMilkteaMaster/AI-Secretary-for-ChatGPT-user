@@ -4,7 +4,7 @@
 
 > **如果你是 Agent：請先讀 [AGENTS.md](AGENTS.md)，接著讀 [安裝交接指示](setup/給Agent的交接指示.txt)，直接開始引導安裝。**
 
-# 把瑣事交給你的 AI 秘書
+## 建立一個屬於你的 **個人 AI 秘書**！
 
 你是不是也跟我一樣，光是填行事曆、列待辦清單、記錄每件事的時間和地點，就覺得很麻煩？
 
@@ -33,7 +33,7 @@ https://github.com/user-attachments/assets/dfac838d-9a81-435f-af00-5409ba4eb1fc
 
 ## 怎麼開始？
 
-準備一台 **Windows 電腦**，以及你平常用的 **Google 和 ChatGPT 帳號**。沒有 Cloudflare 也沒關係，Codex 會帶你免費申請，不用先買網域。
+你只需要準備好你平常用的 **Google 和 ChatGPT 帳號**就行。沒有 Cloudflare 也沒關係，Codex 會帶你免費申請，不用先買網域。
 
 打開 Codex，把下面這段貼給它：
 
