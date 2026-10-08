@@ -4,7 +4,7 @@
 
 - 新封面是使用者指定的「秘書拿筆在平板記錄」版本。首頁 WebP 149,670 bytes，原圖 2,298,309 bytes；縮小 93.5%，點圖仍可看新原圖。
 - 成片 74.8 秒，1280 × 720、30 fps，2,130,344 bytes；舊版 5,294,662 bytes，減少 59.8%。H.264 / AAC，已核對 moov 位於 mdat 之前（faststart）。這是傳輸量改善，不宣稱每種網路的首播秒數相同。
-- GitHub 新附件在 README 編輯預覽中實際播放，currentTime 從 0 前進至 17.01 秒，duration=74.8、paused=false、readyState=4，沒有媒體錯誤。發布後另外核對首頁。
+- GitHub 新附件在 README 編輯預覽中實際播放，currentTime 從 0 前進至 17.01 秒，duration=74.8、paused=false、readyState=4，沒有媒體錯誤。發布後再於首頁核對新版 WebP 已載入，影片從 0 前進至 12.94 秒並播完 74.8 秒結尾，無錯誤；從首頁播放器下載的影片與 repo MP4 SHA-256 完全相同。
 - 影片改成朋友聚會、活動連結與寫信給林老師；已移除 Claude、重開保存狀態、準備報名資料的舊說法。設定步驟、建立新 ChatGPT 專案與放入指示，交給有瀏覽器能力的 Codex；本人登入、授權、確認。
 - 配樂重新生成，實測鼓點約 114 BPM；16 個後續畫面落定點量化至 30 fps，與最近打擊樂拍點最大差 15.37 ms。原生通用節拍偵測產生不合適的 165 BPM，未拿來對拍。實際落點保存在 video/beat-sync.json。
 - Google Puck 一次生成 72.92 秒旁白，未分句剪接。人聲頻段避讓強度降為 0.36，保留鼓點與 bass。實際 MP4 抽出聲音由 Gemini 3.5 Flash Lite 模型審查：清晰度與自然度 5/5、律動 4/5；說話期間仍可聽見鼓點，無異常停頓、滋聲或破音。模型審查不等於人類實聽。成片 -16.2 LUFS，true peak -1.1 dBFS。
@@ -16,6 +16,10 @@
 **結論範圍：** 設定包的乾淨環境安裝、程式模擬測試與引導文件已驗證；沒有拿新 Google／Cloudflare／ChatGPT 帳號走一次真正雲端安裝，不宣稱實機端到端完成。登入授權、功能是否開放、真實收信、日曆寫入與首次 09:00 收信，仍須安裝者當場驗收。Repo 保持 private，未授權者無法只憑網址開始。
 
 官方依據：[Cloudflare 子網域](https://developers.cloudflare.com/workers/configuration/routing/workers-dev/)、[Google 用戶端秘密只在建立時完整下載](https://support.google.com/cloud/answer/15549257?hl=en)。
+
+## Fable 5 最終審查
+
+Claude Code 使用實際模型 `claude-fable-5` 唯讀初審與定向複查，兩輪均判定 pass。七項需求全部核對通過；README 差異、首頁影片檔案比對與 npm 安裝腳本提示的證據缺口已補齊。舊的空白差異檔也已移除。模型未親自播放音訊或操作新帳號；實際瀏覽器驗證與離線測試由 Codex 執行。詳見 [審查摘要](FABLE_REVIEW.md)。
 
 ## 先前驗證紀錄
 
