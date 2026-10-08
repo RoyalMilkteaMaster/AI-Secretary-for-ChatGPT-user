@@ -27,3 +27,7 @@ CREATE TABLE IF NOT EXISTS oauth_tokens (
   expires INTEGER NOT NULL
 );
 CREATE TABLE IF NOT EXISTS oauth_approvals (hash TEXT PRIMARY KEY, expires INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS calendar_proposals (
+  id TEXT PRIMARY KEY, payload TEXT NOT NULL, status TEXT NOT NULL,
+  expires INTEGER NOT NULL, updated_at INTEGER NOT NULL, result TEXT
+);

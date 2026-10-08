@@ -1,71 +1,124 @@
 {
   "date": "2026-10-08",
+  "version": "guided-install-v6",
   "video": {
     "path": "media/ai-secretary-intro.mp4",
-    "sha256": "c207993fb58e7d8a427291213b8ecb2f3102cf5df24d589ca7de09d252c6a1ba",
+    "sha256": "b800ee3e9f9085c701ee962dfe801cdf8502fd3acf9e88f3970cccd370be5c14",
+    "bytes": 5294662,
     "screenshots_used": 0,
-    "duration_seconds": 112.566667,
+    "duration_seconds": 94.5,
     "dimensions": [
       1920,
       1080
     ],
-    "fps": 30
+    "fps": 30,
+    "codec": "H.264 / AAC",
+    "attachment_url": "https://github.com/user-attachments/assets/dfac838d-9a81-435f-af00-5409ba4eb1fc"
   },
   "pdf": {
     "path": "docs/AI秘書完整操作圖解.pdf",
-    "pages": 43,
-    "sha256": "b28ea0b67dfeb2a2537e72b2c11d398373cc5a8ee8c877bfd95d952aa7f5bb92"
+    "pages": 12,
+    "sha256": "bfe89d2775ecb00e02e2228fe38ab11834e669292efab79b93d7d74f31ac9356",
+    "reviewer": "Codex",
+    "all_pages_rendered_and_visually_reviewed": true,
+    "real_anonymized_reference_images": 2,
+    "other_figures": "Explicitly labeled original schematics, including Cloudflare signup"
   },
   "audio": {
-    "voice_review": {
-      "model": "gemini-3.8-flash",
-      "result": {
-        "heard_summary": "你也覺得每天整理待辦、反覆確認截止日很麻煩嗎？試試這個 AI 秘書吧。把事情交辦給它，早上看整理好的提醒，做完就勾選。第一次設定，準備 Windows 電腦，以及收信、寄信用兩個 Gmail。下載設定包，解壓縮，再用 Codex 或 Claude Code 開啟整個資料夾。設定交給這位電腦助手，平常交辦事情則用 ChatGPT。打開「開始這裡」，把裡面的文字貼給助手。它會先檢查環境和帳號功能，問你要用哪些信箱，再協助建立 Cloudflare 服務、完成 Google 設定，把 ChatGPT 的 AI 秘書專案接上。需要你登入或授權時，才請你接手；對照紅框手冊就可以了。密碼和一次性連結碼，不要貼進聊天。設定好後，先在 ChatGPT 建一筆示範待辦，請助手核對預覽，再寄一封驗收信。驗收信一天只寄一封，有問題先查原因。你用 Gmail 打開、勾選，等它顯示「已保存」再關掉重開；接著請秘書查回完成狀態。兩邊一致，清理完示範資料，由你確認後才啟用早上九點的提醒。第一次到點，記得確認收件。以後在 AI 秘書專案裡說：下週五前寄出課程報名資料，請保存，再查回給我看。核對它查回的事情和日期，有變動就接著說：改成下週一，請更新原本那一筆。早上看提醒，做完勾選；還有下一步就繼續交辦。日曆裡的會議要改時間，仍然回 Google 日曆修改。設定細節交給助手，紅框手冊留著查。把設定包交給你的助手，從今天想追蹤的一件事開始吧。",
-        "speech_language": "zh-TW",
-        "voice_character": "專業、清晰且友善的台灣男性旁白，語調沉穩親切，指令節奏流暢易懂。",
-        "speaking_rate": "moderate",
-        "naturalness_1_to_5": 5,
-        "hiss_or_buzz": null,
-        "clicks_or_glitches": null,
-        "unnatural_pauses": null,
-        "music_character": null,
-        "music_suitability": null,
-        "intelligibility_1_to_5": 5,
-        "verdict": "pass",
-        "repairs": null
-      }
-    },
+    "voice_model": "gemini-3.8-flash-tts",
+    "voice": "Puck",
+    "continuous_voice_seconds": 92.28,
     "mix_review": {
       "model": "gemini-3.5-flash-lite",
+      "audio_sha256": "c42cf1eda79ad0eccf2fd89330a828a944df3d08a5639d53676831088beda6f9",
       "result": {
-        "heard_summary": "講者以輕快口吻介紹利用AI秘書處理日常代辦事項的步驟。",
-        "speech_language": "cmn-Hant",
-        "voice_character": "溫和、專業、親切的女性中文配音",
-        "speaking_rate": "略快但清晰易懂",
+        "heard_summary": "台灣華語旁白清晰自然，沒有明顯的滋滋聲或破音，段落停頓合理，配樂聲音適中，聽得到且不會蓋過旁白。",
         "naturalness_1_to_5": 5,
-        "hiss_or_buzz": null,
-        "clicks_or_glitches": null,
-        "unnatural_pauses": [],
-        "music_character": "溫暖輕快的電子放克音樂，104 BPM，有乾淨的低音、爵士鼓與稀疏的電鋼琴聲，無人聲或雜音。",
-        "music_suitability": 5,
         "intelligibility_1_to_5": 5,
+        "music_audible": true,
+        "music_character": "輕快、背景襯樂",
+        "music_suitability_1_to_5": 5,
+        "hiss_or_buzz": "",
+        "clicks_or_glitches": "",
+        "unnatural_pauses": [],
         "verdict": "pass",
         "repairs": []
       }
     },
-    "loudness_lufs": -17.1,
-    "true_peak_dbfs": -1.1,
+    "loudness_lufs": -15.6,
+    "true_peak_dbfs": -1.3,
     "review_audio_matches_delivery": true
   },
   "visual_review": {
-    "reviewer": "Claude Opus 5.5",
-    "sampled_movie_frames": 24,
-    "transition_strip": true,
-    "fixes_verified_by": "Codex",
-    "changed_frames_checked": 9
+    "reviewer": "Codex",
+    "sampled_movie_frames": 22,
+    "hyperframes": {
+      "lint": {
+        "ok": true,
+        "errorCount": 0,
+        "warningCount": 0,
+        "infoCount": 0,
+        "filesScanned": 8
+      },
+      "runtime": {
+        "ok": true,
+        "errorCount": 0,
+        "warningCount": 0,
+        "infoCount": 0
+      },
+      "layout": {
+        "ok": true,
+        "errorCount": 0,
+        "warningCount": 0,
+        "infoCount": 54,
+        "duration": 94.48,
+        "samples": [
+          5.249,
+          15.747,
+          26.244,
+          36.742,
+          47.24,
+          57.738,
+          68.236,
+          78.733,
+          89.231
+        ],
+        "transitionSamples": [],
+        "transitionSamplesDropped": 0,
+        "tolerance": 2,
+        "totalIssueCount": 54,
+        "truncated": false
+      },
+      "contrast": {
+        "ok": true,
+        "errorCount": 0,
+        "warningCount": 0,
+        "infoCount": 0,
+        "enabled": true,
+        "samples": [
+          5.249,
+          26.244,
+          47.24,
+          68.236,
+          89.231
+        ],
+        "checked": 29,
+        "passed": 29
+      }
+    }
+  },
+  "implementation": {
+    "offline_test_suites_passed": 7,
+    "failed": 0,
+    "secret_scan_files": 55,
+    "secret_scan_findings": 0,
+    "independent_code_review": "Claude Opus 5.5 read-only review and follow-up: no material issues in reviewed fixes; minor test-coverage and conservative timeout-state observations remain. Tests were run by Codex, not Claude."
   },
   "limitations": [
     "Model-based audio review, not human listening.",
-    "New-account deployment and scheduled email arrival require each recipient to verify."
-  ]
+    "Independent code review and offline mocks do not substitute for live Google API acceptance.",
+    "New-account deployment, login, permissions, calendar writes, email receipt and first scheduled delivery require each recipient to verify.",
+    "Repository visibility remains private; sharing requires existing repository access."
+  ],
+  "verified_date": "2026-10-09"
 }

@@ -39,6 +39,7 @@ footer{color:var(--muted);font-size:14px;text-align:center;padding:24px}
 </style>
 </head>
 <body>
+<p><b>這份是 Agent 的技術手冊。</b>一般使用者請看 <a href="../docs/AI秘書完整操作圖解.pdf">簡明圖解 PDF</a>。Agent 開始前先確認 Google、ChatGPT、Cloudflare 帳號；缺少時先引導註冊，再執行本手冊。</p>
 <header>
 <h1>AI 秘書：從零設定到每天使用｜操作手冊</h1>
 <p>這是給 agent 閱讀的完整技術參考。請先讀「給Agent的交接指示.txt」；使用者先看圖解手冊前兩頁，需要接手時再看紅框。影片不逐步教後台操作。</p>
@@ -52,7 +53,7 @@ footer{color:var(--muted);font-size:14px;text-align:center;padding:24px}
 <ul>
 <li>附檔裡的程式是原作者實際運作版本的「安全複本」：已移除原作者的信箱、帳戶 ID、資料庫 ID、網址、權杖與所有真實待辦。所有值都要換成<b>你自己的</b>。</li>
 <li>帳號不符時會拒絕授權、拒絕安裝秘密、拒絕寄信。第一次部署時<b>每日寄信一定是關閉的</b>；只有完成第 6 步驗收與第 7 步示範清理、你明確同意後，才會設定每天台灣 09:00（<code>0 1 * * *</code>）。</li>
-<li><b>日曆只讀不寫</b>：雲端服務只讀你指定的一本日曆，列出「今日行程」；ChatGPT 的「AI 秘書進度」外掛只管理待辦，<b>不會</b>新增、修改或刪除 Google 日曆。</li>
+<li><b>日曆先提案再確認</b>：服務只管理指定的一本日曆，查詢行程與撞期。本人明確確認提案後才新增或改期，並讀回核對；不提供刪除。工具與升級見 <a href="../docs/CALENDAR.md">日曆手冊</a>。</li>
 <li>以下事項只有你本人能在自己的畫面確認，附檔與助手都無法替你保證：
   <ul>
   <li>你的 ChatGPT 帳號能不能建立自訂 MCP 外掛、用「預設記憶」建立專案、使用「工作模式」（第 1 步就先核對）。不同方案、地區與工作區可能不同，不要假設最便宜的訂閱一定有。</li>
@@ -68,7 +69,7 @@ footer{color:var(--muted);font-size:14px;text-align:center;padding:24px}
 <ol>
 <li><a href="#c01">設定包、桌面助手、兩個 Gmail</a></li>
 <li><a href="#c02">建立自己的 Cloudflare 服務</a></li>
-<li><a href="#c03">Google 寄信與唯讀日曆授權</a></li>
+<li><a href="#c03">Google 寄信與日曆事件授權</a></li>
 <li><a href="#c04">ChatGPT：自訂 MCP、新專案、工作模式、建立並改期</a></li>
 <li><a href="#c05">開啟 Gmail 動態郵件</a></li>
 <li><a href="#c06">一封驗收信，勾選後讀回</a></li>
@@ -87,7 +88,7 @@ footer{color:var(--muted);font-size:14px;text-align:center;padding:24px}
 <tr><td>Windows 電腦</td><td>Windows 10／11，Chrome 或 Edge。內建的 Windows PowerShell 5.1 即可。</td></tr>
 <tr><td>Node.js</td><td>v22.15 以上，建議 Node.js 24 LTS；缺少時由本人從 nodejs.org 安裝，或明確授權 agent 協助安裝，完成後核對版本。</td></tr>
 <tr><td>桌面助手（二選一）</td><td>Codex 或 Claude Code（可執行本機命令的版本），選一個就好，全程用同一個。不要讓兩個助手同時操作同一個資料夾。</td></tr>
-<tr><td>Gmail ×2</td><td><b>主帳號</b>：你平常收信、放個人日曆的帳號，只授權「日曆唯讀」。<b>專用寄件 Gmail</b>：另外新開一個，只負責寄出總覽。Google 規定 SMTP 寄信要授予<b>完整 Gmail 權限</b>，所以不要用主帳號寄信。兩個不能是同一個。</td></tr>
+<tr><td>Gmail ×2</td><td><b>主帳號</b>：你平常收信、放個人日曆的帳號，只授權「日曆事件讀寫」。<b>專用寄件 Gmail</b>：另外新開一個，只負責寄出總覽。Google 規定 SMTP 寄信要授予<b>完整 Gmail 權限</b>，所以不要用主帳號寄信。兩個不能是同一個。</td></tr>
 <tr><td>Cloudflare 帳號</td><td>先核對目前方案與用量；若出現費用或升級要求，先說明再由本人決定。</td></tr>
 <tr><td>ChatGPT 帳號</td><td>需要能建立自訂 MCP 外掛、用預設記憶建立專案、使用工作模式。下面「前置核對」先確認。</td></tr>
 </table>
@@ -160,11 +161,11 @@ node tools\deploy.mjs</pre>
 </section>
 
 <section id="c03">
-<h2>第 3 步　Google 寄信與唯讀日曆授權</h2>
+<h2>第 3 步　Google 寄信與日曆事件授權</h2>
 <p>具備已授權瀏覽器工具時，由 agent 協助導航及一般表單；沒有工具時由本人操作。服務條款、帳單及其他同意畫面由本人處理。</p><table>
 <tr><th>帳號</th><th>授權範圍</th><th>用途</th></tr>
 <tr><td>專用寄件 Gmail（<code>sender</code>）</td><td>完整 Gmail 權限 <code>https://mail.google.com/</code>（Google 對 SMTP 的要求）</td><td>只用來寄出總覽</td></tr>
-<tr><td>主帳號（<code>recipient</code>）</td><td>日曆事件唯讀 <code>calendar.events.readonly</code></td><td>只讀設定中那一本日曆的今日行程；不新增、修改或刪除</td></tr>
+<tr><td>主帳號（<code>recipient</code>）</td><td>日曆事件讀寫 <code>calendar.events</code></td><td>只管理設定中的一本日曆；先提案、本人確認後新增或改期，不刪除</td></tr>
 </table>
 <h3>建立 Google 應用程式</h3>
 <ol>
@@ -190,10 +191,10 @@ node tools\import-google-client.mjs "C:\Users\你的使用者名稱\Downloads\�
 <pre>node tools\authorize.mjs --smtp</pre>
 <p><span class="tag t-you">本人操作：</span>瀏覽器開啟 <code>http://localhost:8766/start</code>，<b>登入專用寄件 Gmail</b>。若出現「Google 尚未驗證這個應用程式」，先確認畫面上是你自己建立的應用程式名稱，才點「進階」繼續。成功頁出現後，助手會回報已加密保存。</p>
 <div class="warn">完整 Gmail 權限能讀取、傳送與永久刪除該信箱的郵件；程式實際只核對帳號與寄信。這就是要用「專用寄件 Gmail」、不用主帳號的原因。若帳號政策禁止這項授權，先處理帳號或政策，不要略過錯誤。</div>
-<h3>再授權主帳號的日曆（唯讀）</h3>
+<h3>再授權主帳號的日曆（事件讀寫）</h3>
 <p>第一個流程完成後，才啟動第二個（兩個會搶同一個本機埠）。</p>
 <pre>node tools\authorize.mjs --calendar</pre>
-<p><span class="tag t-you">本人操作：</span>再開 <code>http://localhost:8766/start</code>，這次<b>改登入主帳號</b>。範圍只有日曆事件唯讀。</p>
+<p><span class="tag t-you">本人操作：</span>再開 <code>http://localhost:8766/start</code>，這次<b>改登入主帳號</b>。範圍只有日曆事件讀寫。</p>
 <div class="ok">兩個授權都會核對 Google 回報的「實際帳號」：登入錯帳號時不會保存任何憑證，會顯示「帳號不符」。已經有授權時也不會被覆蓋；要重新授權需加 <code>--replace</code>。</div>
 <h3>安裝到自己的 Worker</h3>
 <pre>node tools\install-secrets.mjs        <span class="c"># 對外：經 stdin 管道安裝 6 個秘密</span>
@@ -282,7 +283,7 @@ node tools\admin.mjs send-validation                    <span class="c"># 列出
 <li><b>一件活動一個聊天</b>（工作模式、選「AI 秘書」專案與「AI 秘書進度」外掛）。交辦三件事：活動、下一步、期限；日期不明時讓秘書先問清楚。</li>
 <li><b>早上看信</b>：先看急件與近期截止，再看一般待辦，對照今日行程。信只整理已保存的進度。</li>
 <li><b>延期、取消、完成都要保存並讀回</b>；也可以直接在信裡勾選，兩邊最後應看到同一個狀態。</li>
-<li><b>行程要自己改</b>：日曆是唯讀的，秘書不會替你新增或改期行程。會議改了，到 Google 日曆修改，再請秘書更新相關待辦。</li>
+<li><b>行程先確認再改</b>：請秘書查詢並提出安排，確認標題、日期、時間與撞期結果後才寫入。多人會議或整組重複規則，到 Google Calendar 處理；相關待辦另行更新。</li>
 </ul>
 <h3>做完一步，交辦下一步</h3>
 <p>在第 4 步的同一個聊天：</p>

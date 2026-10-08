@@ -1,6 +1,6 @@
 // Google 授權（改自原 gmail/authorize.mjs）。一次只做一種：
 //   node tools/authorize.mjs --smtp       專用寄件 Gmail，SMTP 需要完整 Gmail 權限 https://mail.google.com/
-//   node tools/authorize.mjs --calendar   收件主帳號，Calendar 事件唯讀
+//   node tools/authorize.mjs --calendar   收件主帳號，Calendar 事件讀寫
 //   加 --replace 才會取代既有授權（例如授權過期需要重新授權）
 // state、PKCE、localhost 回呼、20 分鐘期限；完成後核對 Google 回報的「實際帳號」
 // 必須等於 設定.json 的帳號，否則不保存。
@@ -79,9 +79,9 @@ const server = createServer(async (request, response) => {
     store.write(grant.secret, {client_id: credential.client_id, refresh_token: tokens.refresh_token, account,
       scope: grant.scope, authorized_at: new Date().toISOString()}, {replace: args.flags.has('--replace')});
     response.end(mode === 'calendar'
-      ? '<h1>AI 秘書日曆讀取授權已完成</h1><p>日曆唯讀憑證已經 Windows 加密保存。程式只查設定中的個人日曆；不能新增、修改或刪除行程。尚待安裝到你的 Worker 並實測。</p>'
+      ? '<h1>AI 秘書日曆授權已完成</h1><p>日曆事件授權已經 Windows 加密保存。程式固定管理設定中的一本日曆；新增或改期須先提出安排，再經你確認。尚待安裝到你的 Worker 並實測。</p>'
       : '<h1>AI 秘書 SMTP 授權已完成</h1><p>Google 要求的完整 Gmail 授權已經 Windows 加密保存。程式只用於 SMTP 寄送；尚未寄出任何信。</p>');
-    console.log(`AUTHORIZED: ${mode === 'calendar' ? 'personal calendar read-only' : 'SMTP/full mail scope'} for the configured account; refresh credential encrypted; no email sent.`);
+    console.log(`AUTHORIZED: ${mode === 'calendar' ? 'personal calendar events read/write' : 'SMTP/full mail scope'} for the configured account; refresh credential encrypted; no email sent.`);
   } catch (error) {
     const wrongAccount = /授權的帳號不是/.test(error.message);
     response.writeHead(wrongAccount ? 403 : 500).end(wrongAccount ? `<h1>帳號不符</h1><p>這次登入的不是設定中的${grant.label}，沒有保存任何憑證。請在 Google 授權畫面切換到正確帳號後重試。</p>` : '授權保存失敗，沒有完成設定。請回到助手檢查。');

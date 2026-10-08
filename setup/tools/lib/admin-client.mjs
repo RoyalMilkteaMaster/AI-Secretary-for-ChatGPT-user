@@ -124,10 +124,10 @@ export async function readyCheck(request, {config, humanConfirmed = false}) {
     ['每日排程目前仍關閉（啟用前驗收）', status.schedule_enabled === false],
     ['服務的寄件、收件、日曆與設定一致', status.sender === config.sender && status.recipient === config.recipient && status.calendar === config.calendar && status.mail_accounts_match_settings === true],
     ['寄信憑證已安裝', status.mail_credentials_installed === true],
-    ['日曆讀取已連接', status.calendar_connected === true],
+    ['日曆授權已安裝（仍須實測）', status.calendar_connected === true],
     ['至少一封驗收信已被 Gmail SMTP 接受', (status.deliveries || []).some(d => d.id.startsWith('validation:') && d.status === 'accepted')],
     [`沒有進行中的示範事項${activeDemos.length ? `（仍有效：${activeDemos.join(', ')}）` : ''}`, activeDemos.length === 0],
-    ['本人確認：Gmail 實際收到的驗收信勾選後顯示已保存、重開仍在、聊天讀回 completed、預覽排除已完成', humanConfirmed === true],
+    ['本人確認：Gmail 實際收到的驗收信勾選後顯示已保存、重開仍在、聊天讀回 completed、預覽排除已完成；日曆本人確認後新增、改期同一 ID 並讀回', humanConfirmed === true],
   ].map(([name, ok]) => ({name, ok}));
   return {ok: checks.every(c => c.ok), human_confirmed: humanConfirmed === true, schedule_enabled_at_check: status.schedule_enabled, checks};
 }

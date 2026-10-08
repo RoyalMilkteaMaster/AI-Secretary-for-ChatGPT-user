@@ -147,7 +147,7 @@ const exchange = extra => request('/oauth/token', {method: 'POST', headers: {'Co
 const grant = {grant_type: 'authorization_code', code: callback.searchParams.get('code'), code_verifier: verifier, redirect_uri: params.get('redirect_uri')};
 assert.equal((await exchange({...grant, code_verifier: 'w'.repeat(43)})).status, 400);
 const credentials = await (await exchange(grant)).json(); assert.ok(credentials.access_token); assert.equal((await exchange(grant)).status, 400);
-assert.equal((await (await rpc('tools/list', {}, credentials.access_token)).json()).result.tools.length, 6);
+assert.equal((await (await rpc('tools/list', {}, credentials.access_token)).json()).result.tools.length, 9);
 const init = await (await rpc('initialize', {}, credentials.access_token)).json();
 assert.ok(init.result.instructions.includes(FIXTURE.calendar), 'MCP instructions name the configured calendar');
 const across = await (await rpc('tools/call', {name: 'get_step', arguments: {id: 'A'}}, credentials.access_token)).json();

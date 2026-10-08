@@ -1,27 +1,15 @@
-# 開始使用 AI 秘書
+# 開始設定
 
-先準備自己的 Windows 電腦，以及能讀取本機資料夾和執行命令的 agent。設定工具的環境需求由 agent 先核對。
+1. [下載 ZIP](https://github.com/RoyalMilkteaMaster/AI-Secretary-for-ChatGPT-user/archive/refs/heads/main.zip)，解壓到 Windows 本機資料夾，例如 `C:\AI秘書\`。
+2. 用 Codex 或 Claude Code 開啟整個資料夾。
+3. 貼上：
 
-1. 在 GitHub 按 **Code → Download ZIP**，解壓縮到不會雲端同步的資料夾。
-2. 用 Codex 或 Claude Code 開啟解壓後的整個資料夾，二選一即可。
-3. 把以下文字貼給它：
+> 請讀 AGENTS.md，帶我設定自己的 AI 秘書。先問我有沒有 Google、ChatGPT、Cloudflare 帳號；缺的帶我申請。你能做的設定直接做，要我接手時，一次一個動作。
 
-> 我要設定自己的 AI 秘書。請先讀根目錄的 AGENTS.md，再讀 setup/給Agent的交接指示.txt。請核對環境與帳號功能，詢問必要資料，替我填好設定，依技術手冊完成設定與驗收。能由你處理的工作請直接做；需要我登入、授權或確認時，每次請我做一個動作，並指出 docs/AI秘書完整操作圖解.pdf 的相關頁面。
+Agent 會先確認帳號與功能，再幫你設定。你只需要登入、授權、收一封驗收信，並確認一筆日曆安排。完成後才開啟每天早上 9 點的提醒。
 
-agent 會先說明將在你的帳號建立哪些服務、驗收信寄到哪裡，以及每日提醒安排。本人確認後開始；完成驗收與練習資料清理，才由本人確認啟用每日提醒。
+[打開操作圖解 PDF](docs/AI秘書完整操作圖解.pdf) · [下載 Word](docs/AI秘書完整操作圖解.docx)
 
-## 準備資料
+Cloudflare 註冊免費，本教學用免費方案，不必買網域。每天寄信會另外準備專用 Gmail，Agent 會帶你做。密碼在官方登入頁輸入，不貼給 Agent。
 
-- 專用寄件 Gmail、平常收信的主帳號、指定日曆。
-- 自己的 Cloudflare、Google Cloud、ChatGPT 帳號。
-- 決定先試用，還是完成 Google 長期使用所需的發布與授權設定。
-
-只告訴 agent 帳號地址與必要識別，不貼密碼、金鑰或權杖。私人授權連結碼由本人從剪貼簿貼回授權頁。
-
-## 查閱文件
-
-- [完整 PDF](docs/AI秘書完整操作圖解.pdf)：一般使用者先讀前兩頁，需要接手時再查紅框。
-- [技術手冊](setup/操作手冊.html)：下載後以瀏覽器開啟，供 agent 按章節執行。
-- [流程](docs/FLOW.md)：設定順序、日常使用與驗收。
-
-PDF 是圖解參考；程式與設定工具也在同一份 ZIP。只把 PDF 上傳到一般聊天視窗，不能完成本機部署。
+設定包目前使用 Windows 的加密儲存功能。請把**整個資料夾**交給能操作本機的 Agent；只把 PDF 上傳到一般聊天不能完成設定。

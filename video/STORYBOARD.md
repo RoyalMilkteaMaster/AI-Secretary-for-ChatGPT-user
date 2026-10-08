@@ -1,39 +1,15 @@
 # AI 秘書短片分鏡
 
-文案已核准；所有畫面均為示意動畫，不使用真實電腦截圖。時間由110.24秒連續配音對齊。
+全片示意動畫，無真實電腦截圖；92.28 秒連續配音，加前後留白約 94.5 秒。底部為字幕保留空間。
 
-## Frame 1
-status: animated
-src: compositions/illustrated/ill-00.html
-motion: rules/spring-pop-entrance.md; rules/scale-swap-transition.md; transitions/css-push.md
-beat: 全新示意動畫。小機器人接住一張待辦，連成早上提醒與完成回應；不用任何真實電腦截圖。
+| 時間 | 畫面 | 觀眾得到的資訊 |
+|---|---|---|
+| 00:00–00:14.51 | 小機器人與大字開場 | 一個個填行事曆太麻煩，交給 AI 秘書整理、查撞期、每天提醒 |
+| 00:14.51–00:27.56 | 設定資料夾、Codex / Claude Code、指令示意 | 下載解壓縮，開啟整個資料夾，請 Agent 讀 AGENTS.md |
+| 00:27.56–00:39.81 | 三個帳號，Cloudflare 註冊提示 | Agent 先問帳號，沒有 Cloudflare 就帶你免費註冊 |
+| 00:39.81–00:55.36 | Agent / 本人分工、ChatGPT 專案、12 步圖解 | 設定交給 Agent，本人登入授權；卡住就看紅框 |
+| 00:55.36–01:10.71 | 查撞期、提案、本人確認、同筆改期 | 先核對時間，確認後才排進日曆，不新增重複行程 |
+| 01:10.71–01:21.71 | 驗收信、勾選保存、早上九點 | 確認回存後，才啟用每天提醒 |
+| 01:21.71–01:34.48 | 日常交辦、機器人收尾 | 事情交辦、看信、做完勾選，從下載設定包開始 |
 
-## Frame 2
-status: animated
-src: compositions/illustrated/ill-01.html
-motion: rules/spring-pop-entrance.md; rules/scale-swap-transition.md; transitions/css-push.md
-beat: 全新設定包與資料夾示意動畫，帶出 Windows、兩個 Gmail，以及電腦助手與日常 ChatGPT 的分工。
-
-## Frame 3
-status: animated
-src: compositions/illustrated/ill-02.html
-motion: rules/spring-pop-entrance.md; rules/scale-swap-transition.md; transitions/css-push.md
-beat: 用示意指令卡、流程與紅框手冊插畫，表達助手設定、本人登入授權。無真實介面或私密資料。
-
-## Frame 4
-status: animated
-src: compositions/illustrated/ill-03.html
-motion: rules/spring-pop-entrance.md; rules/scale-swap-transition.md; transitions/css-push.md
-beat: 以重新設計的示意信件，演示一筆虛構待辦的勾選、保存、重開、聊天讀回；清楚標示操作示意。
-
-## Frame 5
-status: animated
-src: compositions/illustrated/ill-04.html
-motion: rules/spring-pop-entrance.md; rules/scale-swap-transition.md; transitions/css-push.md
-beat: 用同一筆課程報名的示意聊天與日期變化，演示新增、改期與完成。Google 日曆修改由本人處理。
-
-## Frame 6
-status: animated
-src: compositions/illustrated/ill-05.html
-motion: rules/spring-pop-entrance.md; rules/scale-swap-transition.md; transitions/css-push.md
-beat: 小機器人完成回應，示意下載入口與倉庫網址。音樂自然收尾。
+依序對應 `compositions/illustrated/ill-00.html` 至 `ill-06.html`。場景間 0.45 秒推移，場景內 0.48 秒推移；時間交疊已包含在 index.html。旁白不隨換鏡剪斷。

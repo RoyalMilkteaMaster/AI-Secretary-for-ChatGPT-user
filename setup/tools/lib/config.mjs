@@ -6,7 +6,7 @@ import {createHash} from 'node:crypto';
 export const FIELDS = {
   sender: '專用寄件 Gmail（寄出每日總覽）',
   recipient: '收件主帳號（收信、個人日曆、日曆授權帳號）',
-  calendar: '要讀取的個人日曆 ID（通常與收件主帳號相同）',
+  calendar: '要管理的個人日曆 ID（通常與收件主帳號相同）',
   timezone: '時區，本版只支援 Asia/Taipei',
   account_id: 'Cloudflare 帳戶 ID（32 位英數）',
   d1_database_name: 'D1 資料庫名稱',

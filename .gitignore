@@ -17,3 +17,7 @@ setup/SHA256SUMS.txt
 video/renders/
 video/snapshots/
 video/.hyperframes/
+
+# Guide build intermediates
+docs/source/generated/
+docs/source/guide-pages.json

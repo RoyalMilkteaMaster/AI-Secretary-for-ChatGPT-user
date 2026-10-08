@@ -2,7 +2,7 @@
 ================================================================
 
 你要協助「本人」在本人自己的 Windows 電腦上，用這個教材資料夾設定本人自己的 AI 秘書：
-自己的 Cloudflare Worker＋D1、自己的 Google OAuth（專用寄件 Gmail 寄信＋主帳號日曆唯讀）、
+自己的 Cloudflare Worker＋D1、自己的 Google OAuth（專用寄件 Gmail 寄信＋主帳號日曆事件讀寫）、
 自己的 ChatGPT 私人外掛。完整技術步驟在「操作手冊.html」。請先讀「給Agent的交接指示.txt」；本版影片只介紹交給 agent 的方式，不逐一教後台設定。
 本人可能完全沒有寫程式經驗。可由你完成的設定、資料填寫與核對直接處理；需要本人接手時，每次只給一個動作。本人登入、帳號選擇與授權仍由本人完成。
 
@@ -40,14 +40,13 @@
    - Google OAuth 政策（測試／正式、權杖期限、未驗證警告）、ChatGPT 外掛與工作模式是否可用、
      公司或學校帳戶的管理限制，這些你無法替本人驗證，要請本人在自己的畫面確認。
    - 不要宣稱任何 ChatGPT 方案（包括最便宜的訂閱）一定支援這些功能；以本人畫面為準。
-7. 日曆是唯讀：雲端服務只讀設定中的一本日曆，「AI 秘書進度」外掛不會新增、修改或刪除
-   Google 日曆。不要對本人承諾聊天能幫他改行程。
+7. 日曆只管理設定中的一本：先提案與展示撞期，取得本人明確確認後才寫入。依 ../docs/CALENDAR.md 使用三個日曆工具與處理不確定結果；不邀請他人、不改整組重複規則、不刪行程。主帳號改用 calendar.events 授權，舊唯讀版必須 --replace 重新授權並更新專案指示。
 8. 一次性連結碼：admin.mjs approve 只把碼放進本機剪貼簿，由本人自己貼到授權頁。不要把碼印出、
    貼回聊天或讓它出現在錄影畫面；若本人正在錄影，提醒他貼上前先暫停錄影或遮住畫面。
 
-二、第 1 步的前置核對：ChatGPT 帳號功能（在動 Cloudflare 與 Google 之前做）
+二、先問三種帳號，再做第 1 步的前置核對：ChatGPT 帳號功能（在動 Cloudflare 與 Google 之前做）
 ------------------------------------------------------------------------
-請本人用電腦瀏覽器登入 ChatGPT，確認左下角是要使用的「個人帳號」，然後逐項回報看得到或看不到：
+先照「給Agent的交接指示.txt」確認 Google、ChatGPT、Cloudflare 帳號；缺 Cloudflare 時先帶本人完成免費註冊。接著請本人用電腦瀏覽器登入 ChatGPT，確認左下角是要使用的「個人帳號」，然後逐項回報看得到或看不到：
   a. 外掛程式 → 新增 → 建立自訂 MCP 伺服器（只看入口，先不要建立）
   b. 新增專案時，記憶可以選「預設記憶」（本教材不用「僅限專案記憶」：它無法做雲端工作）
   c. 輸入框可以切換「工作模式」，並在其中選擇專案
@@ -87,7 +86,7 @@
   node tools\signing-secret.mjs          本機產生並經 stdin 安裝 SIGNING_SECRET
   （可選）node tools\local-acceptance.mjs   離線演練，不寄信；不能當成 Gmail 驗收
 
-第 3 步　Google 寄信與唯讀日曆授權（可協助一般導覽與非秘密表單；登入、選帳號、同意畫面與下載憑證由本人完成）
+第 3 步　Google 寄信與日曆事件授權（可協助一般導覽與非秘密表單；登入、選帳號、同意畫面與下載憑證由本人完成）
   具備已授權瀏覽器工具時協助建立 Google Cloud 專案、啟用 Gmail API 與 Google Calendar API、設定品牌與受眾；沒有工具則引導本人操作。服務條款、帳單與其他同意畫面由本人處理。接著
   建立「網頁應用程式」OAuth 用戶端（重新導向 http://localhost:8766/oauth/callback）
   核對本人 Google 專案 ID，由你填入 google_project_id → node tools\prepare.mjs
@@ -96,7 +95,7 @@
   授權一次一個，不要同時執行兩個：
   node tools\authorize.mjs --smtp        本人開 http://localhost:8766/start，登入「專用寄件 Gmail」
                                          （Google 要求完整 Gmail 權限，所以只用專用寄件信箱）
-  node tools\authorize.mjs --calendar    本人開同一網址，改登入「主帳號」（只有日曆事件唯讀）
+  node tools\authorize.mjs --calendar    本人開同一網址，改登入「主帳號」（日曆事件讀寫，不授權主信箱郵件）
   node tools\install-secrets.mjs         只顯示名稱；核對帳號、範圍、用戶端與專案
   node tools\admin.mjs status            確認 mail_credentials_installed、mail_accounts_match_settings、
                                          calendar_connected 都是 true，schedule_enabled 是 false
@@ -195,3 +194,7 @@
 ------------
 每一步回報：做了什麼指令 → 工具輸出的結論（成功／失敗／未執行）→ 本人下一步要在畫面上做什麼。
 不要附上任何秘密值；設定值（帳號地址、ID）可以列出供本人核對。
+
+八、日曆安排驗收
+----------------
+依 ../docs/CALENDAR.md：用本人指定的一件真實私人行程，讀取 → 提案 → 本人確認 → 寫入讀回，再經本人確認改期並核對同一事件 ID。不能把只讀預覽當成寫入已成功；若本人暫不驗收寫入，交接清楚標記尚未實測。ready-check 的人工確認亦包含這項驗收。

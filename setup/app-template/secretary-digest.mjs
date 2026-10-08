@@ -1,3 +1,5 @@
+import {calendarForDay} from './secretary-calendar.mjs';
+export {calendarForDay} from './secretary-calendar.mjs';
 import {signClaims} from './secretary-sign.mjs';
 import {sendCloudMail} from './cloud-smtp.mjs';
 import {digestSteps,category,localDay} from './secretary-data.mjs';
@@ -29,26 +31,6 @@ export async function renderDigest(items,calendar,secret,{time=Date.now(),valida
  const footer='請使用 Gmail App 或 Gmail 網頁版操作；iPhone 內建「郵件」只會顯示一般版本。互動有效 7 天。';
  const amp=`<!doctype html><html amp4email data-css-strict lang="zh-Hant"><head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script><script async custom-element="amp-list" src="https://cdn.ampproject.org/v0/amp-list-0.1.js"></script><script async custom-element="amp-form" src="https://cdn.ampproject.org/v0/amp-form-0.1.js"></script><script async custom-template="amp-mustache" src="https://cdn.ampproject.org/v0/amp-mustache-0.2.js"></script><style amp4email-boilerplate>body{visibility:hidden}</style><style amp-custom>body{font-family:Arial,sans-serif;padding:16px;color:#263238;line-height:1.5}h1{font-size:24px}h2{font-size:19px;margin-top:30px}.task{border:1px solid #e1e5ea;border-radius:12px;margin:12px 0;padding:12px}.meta{font-size:13px;color:#5f6368}.detail{font-size:14px}label{display:flex;gap:12px;align-items:flex-start;padding:8px 0}input[type=checkbox]{min-width:24px;width:24px;height:24px}.done,.saved{color:#137333}.done span{text-decoration:line-through}.chat{font-size:13px}.warn,[submit-error]{color:#b91c1c}footer{font-size:12px;color:#666;margin-top:30px}</style></head><body><h1>${heading}</h1><p>${intro}</p>${warning?`<p class="warn">${escape(warning)}</p>`:''}${sections.map(s=>s.amp).join('')}${eventHtml}<footer>${footer}</footer></body></html>`;
  return {subject:heading,amp,html:`<h1>${heading}</h1><p>${intro}</p><p><b>一般郵件版本：請改用 Gmail App 開啟同一封信，才能在信內勾選。</b></p>${warning?'<p>'+escape(warning)+'</p>':''}${sections.map(s=>s.html).join('')}${eventHtml}<p>${footer}</p>`,text:[heading,intro,warning,...sections.map(s=>s.text),'今日行程\n'+(eventLines.join('\n')||'今天沒有行程。'),footer].filter(Boolean).join('\n\n')};
-}
-export async function calendarForDay(env,day) {
- if(!OWNER.configured||!OWNER.calendar) throw Error('CALENDAR_NOT_CONFIGURED');
- if(!env.CALENDAR_REFRESH_TOKEN) return {events:[],checked_at:null,warning:'今日行程尚未連接雲端日曆，不能視為今天沒有行程。'};
- const response=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'refresh_token',client_id:env.GMAIL_CLIENT_ID,client_secret:env.GMAIL_CLIENT_SECRET,refresh_token:env.CALENDAR_REFRESH_TOKEN}),signal:AbortSignal.timeout(15000)});
- if(!response.ok) throw Error('CALENDAR_AUTH_FAILED');
- const credential=await response.json();
- const tomorrow=new Date(Date.parse(day+'T00:00:00+08:00')+86400000).toISOString();
- const events=[];let pageToken='';let pages=0;
- do {
-  const url=new URL('https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(OWNER.calendar)+'/events');
-  url.search=new URLSearchParams({timeMin:day+'T00:00:00+08:00',timeMax:tomorrow,timeZone:'Asia/Taipei',singleEvents:'true',orderBy:'startTime',maxResults:'250',fields:'items(id,summary,start,end,status),nextPageToken',...(pageToken?{pageToken}:{})});
-  const result=await fetch(url,{headers:{Authorization:'Bearer '+credential.access_token},signal:AbortSignal.timeout(15000)});
-  if(!result.ok) throw Error('CALENDAR_READ_FAILED');
-  const data=await result.json();
-  for(const e of data.items||[]) if(e.status!=='cancelled') events.push({id:e.id,title:e.summary||'未命名行程',start:e.start.dateTime||e.start.date,end:e.end.dateTime||e.end.date,all_day:!!e.start.date});
-  pageToken=data.nextPageToken||'';pages++;
-  if(pageToken&&pages>=10) throw Error('CALENDAR_INCOMPLETE');
- } while(pageToken);
- return {events,checked_at:new Date().toISOString(),warning:''};
 }
 export async function sendDigest(env,{time=Date.now(),validation=false,preview=false}={},dependencies={}) {
  const day=localDay(time),id=(validation?'validation:':'daily:')+day;

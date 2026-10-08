@@ -2,7 +2,7 @@
 // fixed-account protection, but the expected accounts come from the validated
 // 設定.json instead of the original author's hard-coded addresses.
 export const REDIRECT = 'http://localhost:8766/oauth/callback';
-const CALENDAR_SCOPE = 'https://www.googleapis.com/auth/calendar.events.readonly';
+const CALENDAR_SCOPE = 'https://www.googleapis.com/auth/calendar.events';
 export const GRANTS = {
   smtp: {secret: 'gmail-smtp', scope: 'https://mail.google.com/', request: ['https://mail.google.com/'],
     allowed: ['https://mail.google.com/', 'https://www.googleapis.com/auth/gmail.send'], role: 'sender', label: '專用寄件 Gmail'},
@@ -57,7 +57,7 @@ export function planSecretInstall(config, material, groups = Object.keys(SECRET_
   const checkGrant = (mode, item) => {
     if (!item?.refresh_token) throw new Error(`尚未完成${GRANTS[mode].label}授權（authorize.mjs --${mode}）`);
     if (item.account !== expectedAccount(mode, config)) throw new Error(`已保存的${GRANTS[mode].label}授權屬於其他帳號；請用正確帳號重新授權（--replace）`);
-    if (item.scope !== GRANTS[mode].scope) throw new Error(`${GRANTS[mode].label}授權範圍不符`);
+    if (item.scope !== GRANTS[mode].scope) throw new Error(`${GRANTS[mode].label}授權範圍不符；請以 --calendar --replace 重新授權`);
     if (item.client_id !== client.client_id) throw new Error(`${GRANTS[mode].label}授權來自另一個 OAuth 用戶端；請重新授權（--replace）`);
   };
   if (needs.has('smtp')) checkGrant('smtp', smtp);
